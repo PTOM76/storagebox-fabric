@@ -3,12 +3,16 @@
   "id": "storagebox",
   "version": "${version}",
   "name": "StorageBox for Fabric",
-  "description": "Original: StorageBox_v3.2.3",
+  "description": "This mod is a port of the original Unyuho's StorageBox to Fabric.",
   "authors": [
     "Pitan"
   ],
   "contributors": [],
-  "contact": {},
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/storagebox-fabric",
+    "sources": "https://github.com/PTOM76/storagebox-fabric",
+    "issues": "https://github.com/PTOM76/storagebox-fabric/issues"
+  },
   "license": "MIT",
   "icon": "assets/storagebox/icon.png",
   "environment": "*",

@@ -12,6 +12,7 @@ import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,25 +38,29 @@ public class StorageBoxClient implements ClientModInitializer {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            BUF.writeString("put_out_and_throw");
+                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_out_and_throw");
+                            BUF.writeCompoundTag(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
-                            // 取り出す: (: + Shift)
+                            // 取り出す or コンテナーへ一括収納: (: + Shift)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            BUF.writeString("put_out");
+                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_out");
+                            BUF.writeCompoundTag(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
 
                     } else {
                         if (isKeyDownCtrl()) {
-                            // コンテナーへ一括収納: (: + Ctrl)
+                            // AutoCollect切り替え: (: + Ctrl)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            BUF.writeString("put_out_with_chest");
+                            CompoundTag tag = new CompoundTag();tag.putString("type", "auto_collect");
+                            BUF.writeCompoundTag(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            BUF.writeString("put_in");
+                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_in");
+                            BUF.writeCompoundTag(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
                     }
@@ -66,13 +71,22 @@ public class StorageBoxClient implements ClientModInitializer {
                 if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasTag())
                     StorageBoxItem.showBar(player, player.getMainHandStack());
             }
+            coolDown--;
         });
         //ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> new ModelProvider());
     }
-
+    private int coolDown = 0;
     private boolean isKeyPressed() {
         final Window mw = MinecraftClient.getInstance().getWindow();
-        return InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode());
+        if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
+            if (coolDown <= 0) {
+                coolDown = 3;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
     private boolean isKeyDownShift() {

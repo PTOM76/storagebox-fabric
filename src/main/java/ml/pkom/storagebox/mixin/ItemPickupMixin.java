@@ -27,7 +27,8 @@ public class ItemPickupMixin {
                 int maxSize = player.inventory.main.size() - 1;
                 for (int i = 0; i <= maxSize; i++) {
                     ItemStack itemStack2 = player.inventory.getStack(i);
-                    if (itemStack2.getItem() == StorageBoxItem.instance) if (itemStack2.hasTag()) {
+                    if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
+                        if (!StorageBoxItem.isAutoCollect(itemStack2)) continue;
                         CompoundTag tag = itemStack2.getTag();
                         ItemStack stackInTag = ItemStack.fromTag(tag.getCompound("item"));
                         if (stackInTag.getItem() == itemStack.getItem()) {
@@ -42,15 +43,17 @@ public class ItemPickupMixin {
                 }
                 if (!insertedBox) {
                     ItemStack itemStack2 = player.getOffHandStack();
-                    if (itemStack2.getItem() == StorageBoxItem.instance) if (itemStack2.hasTag()) {
-                        CompoundTag tag = itemStack2.getTag();
-                        ItemStack stackInTag = ItemStack.fromTag(tag.getCompound("item"));
-                        if (stackInTag.getItem() == itemStack.getItem()) {
-                            if (StorageBoxSlot.canInsertStack(itemStack)) {
-                                tag.putInt("countInBox", tag.getInt("countInBox") + itemStack.getCount());
-                                itemStack2.setTag(tag);
-                                insertedBox = true;
-                                itemStack = ItemStack.EMPTY;
+                    if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
+                        if (StorageBoxItem.isAutoCollect(itemStack2)) {
+                            CompoundTag tag = itemStack2.getTag();
+                            ItemStack stackInTag = ItemStack.fromTag(tag.getCompound("item"));
+                            if (stackInTag.getItem() == itemStack.getItem()) {
+                                if (StorageBoxSlot.canInsertStack(itemStack)) {
+                                    tag.putInt("countInBox", tag.getInt("countInBox") + itemStack.getCount());
+                                    itemStack2.setTag(tag);
+                                    insertedBox = true;
+                                    itemStack = ItemStack.EMPTY;
+                                }
                             }
                         }
                     }

@@ -7,7 +7,7 @@ public class StorageBoxServer {
 
     public static void init() {
         ServerPlayNetworking.registerGlobalReceiver(StorageBoxMod.id("key"), (server, player, handler, buf, responseSender) -> {
-            String str = buf.readString();
+            String str = buf.readCompoundTag().getString("type");
             if (str.equals("put_out"))
                 server.execute(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
@@ -32,7 +32,7 @@ public class StorageBoxServer {
                         item.keyboardEvent(2, player, itemStack);
                     }
                 });
-            if (str.equals("put_out_with_chest"))
+            if (str.equals("auto_collect"))
                 server.execute(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();

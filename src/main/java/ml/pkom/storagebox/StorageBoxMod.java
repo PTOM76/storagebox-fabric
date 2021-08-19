@@ -1,8 +1,6 @@
 package ml.pkom.storagebox;
 
-import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.Level;
@@ -17,9 +15,7 @@ public class StorageBoxMod implements ModInitializer
     @Override
     public void onInitialize() {
         Registry.register(Registry.ITEM, id("storagebox"), StorageBoxItem.instance);
-        log(Level.INFO, "init");
         StorageBoxServer.init();
-
     }
 
     private static Logger LOGGER = LogManager.getLogger();

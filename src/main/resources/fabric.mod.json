@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "storagebox",
+  "version": "${version}",
+  "name": "StorageBox for Fabric",
+  "description": "Original: StorageBox_v3.2.3",
+  "authors": [
+    "Pitan"
+  ],
+  "contributors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/storagebox/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "ml.pkom.storagebox.StorageBoxMod"
+    ],
+    "client": ["ml.pkom.storagebox.StorageBoxClient"]
+  },
+  "mixins": ["storagebox.mixins.json"],
+  "depends": {
+    "fabricloader": "*",
+    "fabric": "*",
+    "minecraft": "1.16.x",
+    "fabric-key-binding-api-v1": "*"
+  }
+}

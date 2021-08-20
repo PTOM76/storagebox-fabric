@@ -32,7 +32,7 @@ public class StorageBoxItem extends Item {
         CompoundTag tag = stack.getTag();
         if (tag != null) if (tag.contains("item")) {
             ItemStack itemInBox = ItemStack.fromTag(tag.getCompound("item"));
-            player.sendMessage(new LiteralText(itemInBox.getName().getString() + "/" + tag.getInt("countInBox") + "stack"), true);
+            player.sendMessage(new LiteralText(itemInBox.getName().getString() + "/" + instance.calcItemNumByUnit(tag.getInt("countInBox"), false, itemInBox.getMaxCount())), true);
         }
     }
 
@@ -299,10 +299,44 @@ public class StorageBoxItem extends Item {
             ItemStack itemInBox = ItemStack.fromTag(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
             tooltip.add(new LiteralText("§7Name: " + itemInBox.getItem().getName().getString()));
-            tooltip.add(new LiteralText("§7Stack: " + count));
+            tooltip.add(new LiteralText("§7Unit: " + calcItemNumByUnit(count , false, itemInBox.getMaxCount()).toString()));
+            tooltip.add(new LiteralText("§7Items: " + count));
             tooltip.add(new LiteralText("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
             tooltip.add(new LiteralText("§7[Information]"));
         }
+    }
+
+    private StringBuilder calcItemNumByUnit(int count, boolean appendItemNum, int maxStackCount) {
+        StringBuilder sb = new StringBuilder("Empty");
+        sb.setLength(0);
+        int LCNUM = 9 * 6 * maxStackCount;
+        int n = count;
+        int i = n / LCNUM;
+        boolean isHigherUnit = false;
+        if (i >= 1) {
+            isHigherUnit = true;
+            sb.append(i).append("LC");
+            n -= i * LCNUM;
+        }
+        i = n / maxStackCount;
+        if (i >= 1) {
+            isHigherUnit = true;
+            if (sb.length() >= 1) {
+                sb.append('+');
+            }
+            sb.append(i).append("stacks");
+            n -= i * maxStackCount;
+        }
+        if (n >= 1) {
+            if (sb.length() >= 1) {
+                sb.append('+');
+            }
+            sb.append(n).append("items");
+        }
+        if (isHigherUnit && appendItemNum) {
+            sb.append('(').append(count).append("items)");
+        }
+        return sb;
     }
 
     public static boolean isAutoCollect(ItemStack stack) {

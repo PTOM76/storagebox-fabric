@@ -8,21 +8,27 @@ import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.model.ModelHelper;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.*;
+import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.render.model.json.ModelOverrideList;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.client.util.SpriteIdentifier;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.BlockRenderView;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -31,10 +37,11 @@ import java.util.function.Supplier;
 
 public class StorageBoxModel implements UnbakedModel, BakedModel, FabricBakedModel {
 
-    private SpriteIdentifier[] SPRITE_IDS = new SpriteIdentifier[]{
-    };
-    private Sprite[] SPRITES = new Sprite[5];
-    private Mesh mesh;
+    private static final Identifier DEFAULT_TEX = StorageBoxMod.id("item/storagebox");
+    private static final ModelIdentifier DEFAULT_MODEL = new ModelIdentifier("storagebox:item/storagebox");
+
+    private Identifier TEX = DEFAULT_TEX;
+    private ModelIdentifier MODEL = DEFAULT_MODEL;
 
     @Override
     public boolean isVanillaAdapter() {
@@ -48,18 +55,25 @@ public class StorageBoxModel implements UnbakedModel, BakedModel, FabricBakedMod
 
     @Override
     public void emitItemQuads(ItemStack stack, Supplier<Random> randomSupplier, RenderContext context) {
-        System.out.println(stack.getTag());
-        context.meshConsumer().accept(mesh);
+        CompoundTag tag = stack.getTag();
+        if (tag.contains("item")) {
+            ItemStack itemInBox = ItemStack.fromTag(tag.getCompound("item"));
+            Item item = itemInBox.getItem();
+            Identifier id = Registry.ITEM.getId(item);
+            MODEL = new ModelIdentifier(id.getNamespace(), "item/" + id.getPath());
+        }
+        BakedModelManager bakedModelManager = MinecraftClient.getInstance().getBakedModelManager();
+        context.fallbackConsumer().accept(bakedModelManager.getModel(MODEL));
     }
 
     @Override
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction face, Random random) {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public boolean useAmbientOcclusion() {
-        return false;
+        return true;
     }
 
     @Override
@@ -79,53 +93,38 @@ public class StorageBoxModel implements UnbakedModel, BakedModel, FabricBakedMod
 
     @Override
     public Sprite getSprite() {
-        return null;
+        return MinecraftClient.getInstance()
+                .getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE)
+                .apply(TEX);
     }
 
     @Override
     public ModelTransformation getTransformation() {
-        return null;
+        JsonUnbakedModel model = (JsonUnbakedModel) modelLoader.getOrLoadModel(MODEL);
+        return model.getTransformations();
     }
 
     @Override
     public ModelOverrideList getOverrides() {
-        return null;
+        return ModelOverrideList.EMPTY;
     }
 
     @Override
     public Collection<Identifier> getModelDependencies() {
-        return Collections.emptyList(); // This model does not depend on other models.
+        return Collections.emptyList();
     }
 
     @Override
     public Collection<SpriteIdentifier> getTextureDependencies(Function<Identifier, UnbakedModel> unbakedModelGetter, Set<Pair<String, String>> unresolvedTextureReferences) {
-        return Arrays.asList(SPRITE_IDS); // The textures this model (and all its model dependencies, and their dependencies, etc...!) depends on.
+        return Collections.emptyList();
     }
 
+    ModelLoader modelLoader;
 
+    @Nullable
     @Override
     public BakedModel bake(ModelLoader loader, Function<SpriteIdentifier, Sprite> textureGetter, ModelBakeSettings rotationContainer, Identifier modelId) {
-        // Get the sprites
-        for(int i = 0; i < SPRITE_IDS.length; ++i) {
-            SPRITES[i] = textureGetter.apply(SPRITE_IDS[i]);
-        }
-        // Build the mesh using the Renderer API
-        Renderer renderer = RendererAccess.INSTANCE.getRenderer();
-        MeshBuilder builder = renderer.meshBuilder();
-        QuadEmitter emitter = builder.getEmitter();
-
-            //int spriteIdx = direction == Direction.UP || direction == Direction.DOWN ? 1 : 0;
-            // Add a new face to the mesh
-            emitter.square(null, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f);
-            // Set the sprite of the face, must be called after .square()
-            // We haven't specified any UV coordinates, so we want to use the whole texture. BAKE_LOCK_UV does exactly that.
-            emitter.spriteBake(0, SPRITES[0], MutableQuadView.BAKE_LOCK_UV);
-            // Enable texture usage
-            emitter.spriteColor(0, -1, -1, -1, -1);
-            // Add the quad to the mesh
-            emitter.emit();
-        mesh = builder.build();
-
+        modelLoader = loader;
         return this;
     }
 }

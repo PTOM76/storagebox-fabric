@@ -73,7 +73,7 @@ public class StorageBoxClient implements ClientModInitializer {
             }
             coolDown--;
         });
-        //ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> new ModelProvider());
+        // ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> new ModelProvider());
     }
     private int coolDown = 0;
     private boolean isKeyPressed() {

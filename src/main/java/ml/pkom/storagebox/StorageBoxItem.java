@@ -89,6 +89,8 @@ public class StorageBoxItem extends Item {
                 if (itemInBox.getCount() <= 0) {
                     tag.remove("countInBox");
                     tag.remove("item");
+                    if (tag.contains("autoCollect")) tag.remove("autoCollect");
+
                 } else {
                     tag.putInt("countInBox", countInBox);
                     tag.put("item", itemInBox.toTag(new CompoundTag()));
@@ -156,6 +158,7 @@ public class StorageBoxItem extends Item {
                 if (itemInBox.getCount() <= 0) {
                     tag.remove("countInBox");
                     tag.remove("item");
+                    if (tag.contains("autoCollect")) tag.remove("autoCollect");
                 } else {
                     tag.putInt("countInBox", countInBox);
                     tag.put("item", itemInBox.toTag(new CompoundTag()));
@@ -190,6 +193,7 @@ public class StorageBoxItem extends Item {
                         slot.setStack(setStack);
                         tag.remove("countInBox");
                         tag.remove("item");
+                        if (tag.contains("autoCollect")) tag.remove("autoCollect");
                         break;
                     }
                 }
@@ -218,6 +222,7 @@ public class StorageBoxItem extends Item {
                     player.dropItem(giveStack, false);
                 }                tag.remove("countInBox");
                 tag.remove("item");
+                if (tag.contains("autoCollect")) tag.remove("autoCollect");
             }
             itemStack.setTag(tag);
             return;
@@ -236,6 +241,7 @@ public class StorageBoxItem extends Item {
                 player.dropItem(dropStack, false);
                 tag.remove("countInBox");
                 tag.remove("item");
+                if (tag.contains("autoCollect")) tag.remove("autoCollect");
             }
             itemStack.setTag(tag);
             return;

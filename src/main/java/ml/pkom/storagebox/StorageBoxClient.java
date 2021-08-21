@@ -8,11 +8,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
@@ -33,19 +33,19 @@ public class StorageBoxClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (isKeyPressed()) {
                 PlayerEntity player = client.player;
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasTag()) {
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt()) {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_out_and_throw");
-                            BUF.writeCompoundTag(tag);
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out_and_throw");
+                            BUF.writeNbt(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
                             // 取り出す or コンテナーへ一括収納: (: + Shift)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_out");
-                            BUF.writeCompoundTag(tag);
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out");
+                            BUF.writeNbt(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
 
@@ -53,14 +53,14 @@ public class StorageBoxClient implements ClientModInitializer {
                         if (isKeyDownCtrl()) {
                             // AutoCollect切り替え: (: + Ctrl)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            CompoundTag tag = new CompoundTag();tag.putString("type", "auto_collect");
-                            BUF.writeCompoundTag(tag);
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "auto_collect");
+                            BUF.writeNbt(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
                             PacketByteBuf BUF = PacketByteBufs.create();
-                            CompoundTag tag = new CompoundTag();tag.putString("type", "put_in");
-                            BUF.writeCompoundTag(tag);
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_in");
+                            BUF.writeNbt(tag);
                             ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
                     }
@@ -68,7 +68,7 @@ public class StorageBoxClient implements ClientModInitializer {
             }
             if (client.player != null) {
                 PlayerEntity player = client.player;
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasTag())
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt())
                     StorageBoxItem.showBar(player, player.getMainHandStack());
             }
             coolDown--;

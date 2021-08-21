@@ -3,7 +3,7 @@ package ml.pkom.storagebox;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
 
 public class StorageBoxSlot extends Slot {
@@ -25,7 +25,7 @@ public class StorageBoxSlot extends Slot {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (stack.hasTag()) return false;
+        if (stack.hasNbt()) return false;
         return true;
     }
 
@@ -34,18 +34,18 @@ public class StorageBoxSlot extends Slot {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack handItem = player.getMainHandStack();
-            CompoundTag tag = handItem.getTag();
-            if (tag == null) tag = new CompoundTag();
+            NbtCompound tag = handItem.getNbt();
+            if (tag == null) tag = new NbtCompound();
             tag.remove("countInBox");
             tag.remove("item");
-            handItem.setTag(tag);
+            handItem.setNbt(tag);
             return;
         }
         ItemStack handItem = player.getMainHandStack();
-        CompoundTag tag = handItem.getTag();
-        if (tag == null) tag = new CompoundTag();
+        NbtCompound tag = handItem.getNbt();
+        if (tag == null) tag = new NbtCompound();
         tag.putInt("countInBox", itemStack.getCount());
-        tag.put("item", itemStack.toTag(new CompoundTag()));
-        handItem.setTag(tag);
+        tag.put("item", itemStack.writeNbt(new NbtCompound()));
+        handItem.setNbt(tag);
     }
 }

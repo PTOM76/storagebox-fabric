@@ -6,7 +6,6 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.stat.Stats;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,12 +28,11 @@ public class ItemPickupMixin {
                     ItemStack itemStack2 = player.inventory.getStack(i);
                     if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
                         if (!StorageBoxItem.isAutoCollect(itemStack2)) continue;
-                        CompoundTag tag = itemStack2.getTag();
-                        ItemStack stackInTag = ItemStack.fromTag(tag.getCompound("item"));
+                        ItemStack stackInTag = StorageBoxItem.getStackInBox(itemStack2);
                         if (stackInTag.getItem() == itemStack.getItem()) {
                             if (!StorageBoxSlot.canInsertStack(itemStack)) continue;
-                            tag.putInt("countInBox", tag.getInt("countInBox") + itemStack.getCount());
-                            itemStack2.setTag(tag);
+                            StorageBoxItem.getNBT(itemStack2).putInt("countInBox", StorageBoxItem.getNBT(itemStack2).getInt("countInBox") + itemStack.getCount());
+                            itemStack2.setTag(StorageBoxItem.getNBT(itemStack2));
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;
                             break;
@@ -45,14 +43,15 @@ public class ItemPickupMixin {
                     ItemStack itemStack2 = player.getOffHandStack();
                     if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
                         if (StorageBoxItem.isAutoCollect(itemStack2)) {
-                            CompoundTag tag = itemStack2.getTag();
-                            ItemStack stackInTag = ItemStack.fromTag(tag.getCompound("item"));
-                            if (stackInTag.getItem() == itemStack.getItem()) {
-                                if (StorageBoxSlot.canInsertStack(itemStack)) {
-                                    tag.putInt("countInBox", tag.getInt("countInBox") + itemStack.getCount());
-                                    itemStack2.setTag(tag);
-                                    insertedBox = true;
-                                    itemStack = ItemStack.EMPTY;
+                            if (StorageBoxItem.getNBT(itemStack2).contains("item")) {
+                                ItemStack stackInTag = StorageBoxItem.getStackInBox(itemStack2);
+                                if (stackInTag.getItem() == itemStack.getItem()) {
+                                    if (StorageBoxSlot.canInsertStack(itemStack)) {
+                                        StorageBoxItem.getNBT(itemStack2).putInt("countInBox", StorageBoxItem.getNBT(itemStack2).getInt("countInBox") + itemStack.getCount());
+                                        itemStack2.setTag(StorageBoxItem.getNBT(itemStack2));
+                                        insertedBox = true;
+                                        itemStack = ItemStack.EMPTY;
+                                    }
                                 }
                             }
                         }

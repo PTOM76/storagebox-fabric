@@ -1,18 +1,16 @@
 package ml.pkom.storagebox;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.slot.Slot;
 
 public class StorageBoxSlot extends Slot {
 
-    private PlayerEntity player;
+    private ItemStack exeStack;
 
-    public StorageBoxSlot(Inventory inventory, int index, int x, int y, PlayerEntity player) {
+    public StorageBoxSlot(Inventory inventory, int index, int x, int y, ItemStack stack) {
         super(inventory, index, x, y);
-        this.player = player;
+        this.exeStack = stack;
 
     }
 
@@ -22,10 +20,10 @@ public class StorageBoxSlot extends Slot {
     }
 
     public static boolean canInsertStack(ItemStack stack) {
-        if (stack.getItem() == StorageBoxItem.instance) return false;
+        if (stack.getItem() instanceof StorageBoxItem) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (stack.hasTag()) return false;
+        if (StorageBoxItem.hasNBT(stack)) return false;
         return true;
     }
 
@@ -33,19 +31,17 @@ public class StorageBoxSlot extends Slot {
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
-            ItemStack handItem = player.getMainHandStack();
-            CompoundTag tag = handItem.getTag();
-            if (tag == null) tag = new CompoundTag();
-            tag.remove("countInBox");
-            tag.remove("item");
-            handItem.setTag(tag);
+            ItemStack handItem = exeStack;
+            if (StorageBoxItem.hasNBT(handItem)) {
+                StorageBoxItem.getNBT(handItem).remove("countInBox");
+                StorageBoxItem.getNBT(handItem).remove("item");
+                StorageBoxItem.setNBT(handItem);
+            }
             return;
         }
-        ItemStack handItem = player.getMainHandStack();
-        CompoundTag tag = handItem.getTag();
-        if (tag == null) tag = new CompoundTag();
-        tag.putInt("countInBox", itemStack.getCount());
-        tag.put("item", itemStack.toTag(new CompoundTag()));
-        handItem.setTag(tag);
+        ItemStack handItem = exeStack;
+        StorageBoxItem.getNBT(handItem).putInt("countInBox", itemStack.getCount());
+        StorageBoxItem.getNBT(handItem).put("item", itemStack.toTag(StorageBoxItem.newNBT()));
+        StorageBoxItem.setNBT(handItem);
     }
 }

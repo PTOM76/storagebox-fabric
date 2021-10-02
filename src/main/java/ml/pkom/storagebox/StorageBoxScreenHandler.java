@@ -15,16 +15,24 @@ public class StorageBoxScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
 
+    public ItemStack exeStack;
+
     public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         this(syncId, playerInventory);
     }
 
     protected StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(SCREEN_HANDLER_TYPE, syncId);
+        exeStack = playerInventory.player.getMainHandStack();
         inventory = new StorageBoxInventory();
+        if (!(exeStack.getItem() instanceof StorageBoxItem)) {
+            close(playerInventory.player);
+            return;
+        }
+
         int m, l;
 
-        addSlot(new StorageBoxSlot(inventory, 0, 12, 35, playerInventory.player));
+        addSlot(new StorageBoxSlot(inventory, 0, 12, 35, exeStack));
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {
                 addSlot(new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 84 + m * 18));
@@ -51,9 +59,13 @@ public class StorageBoxScreenHandler extends ScreenHandler {
                 if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            }
+
+            if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
                 return ItemStack.EMPTY;
             }
+
+            if (originalStack == exeStack) return ItemStack.EMPTY;
 
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);

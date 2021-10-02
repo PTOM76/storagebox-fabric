@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "storagebox",
   "version": "${version}",
-  "name": "StorageBox for Fabric",
+  "name": "StorageBox",
   "description": "This mod is a port of the original Unyuho's StorageBox to Fabric.",
   "authors": [
     "Pitan"
@@ -22,7 +22,16 @@
     ],
     "client": ["ml.pkom.storagebox.StorageBoxClient"]
   },
-  "mixins": ["storagebox.mixins.json"],
+  "mixins": [
+    {
+      "config": "storagebox.client.mixins.json",
+      "environment": "client"
+    },
+    {
+      "config": "storagebox.mixins.json",
+      "environment": "*"
+    }
+  ],
   "depends": {
     "fabricloader": "*",
     "fabric": "*",

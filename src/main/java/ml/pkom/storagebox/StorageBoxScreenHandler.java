@@ -11,7 +11,11 @@ import net.minecraft.screen.slot.Slot;
 
 public class StorageBoxScreenHandler extends ScreenHandler {
 
-    public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(StorageBoxMod.id("storagebox"), StorageBoxScreenHandler::new);
+    public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
+
+    public static void init() {
+        SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(StorageBoxMod.id("storagebox"), StorageBoxScreenHandler::new);
+    }
 
     private final Inventory inventory;
 

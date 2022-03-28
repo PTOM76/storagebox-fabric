@@ -287,10 +287,10 @@ public class StorageBoxItem extends Item {
             NbtCompound tag = itemStack.getNbt();
             if (isAutoCollect(itemStack)) {
                 tag.putBoolean("autoCollect", false);
-                player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCorrect changed OFF"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCollect changed OFF"), false);
             } else {
                 tag.remove("autoCollect");
-                player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCorrect changed ON"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCollect changed ON"), false);
             }
             itemStack.setNbt(tag);
             return;

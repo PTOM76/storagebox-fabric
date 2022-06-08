@@ -1,5 +1,6 @@
 package ml.pkom.storagebox;
 
+import ml.pkom.mcpitanlib.api.text.TextUtil;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -8,7 +9,6 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -32,7 +32,7 @@ public class StorageBoxItem extends Item {
         NbtCompound tag = stack.getNbt();
         if (tag != null) if (tag.contains("item")) {
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
-            player.sendMessage(new LiteralText(itemInBox.getName().getString() + "/" + instance.calcItemNumByUnit(tag.getInt("countInBox"), false, itemInBox.getMaxCount())), true);
+            player.sendMessage(TextUtil.literal(itemInBox.getName().getString() + "/" + instance.calcItemNumByUnit(tag.getInt("countInBox"), false, itemInBox.getMaxCount())), true);
         }
     }
 
@@ -100,7 +100,7 @@ public class StorageBoxItem extends Item {
             return canUse ? TypedActionResult.success(itemStack) : TypedActionResult.pass(itemStack);
         }
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), new LiteralText(""));
+            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), TextUtil.literal(""));
             if (screenHandlerFactory != null) {
                 user.openHandledScreen(screenHandlerFactory);
             }
@@ -287,10 +287,10 @@ public class StorageBoxItem extends Item {
             NbtCompound tag = itemStack.getNbt();
             if (isAutoCollect(itemStack)) {
                 tag.putBoolean("autoCollect", false);
-                player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCollect changed OFF"), false);
+                player.sendMessage(TextUtil.literal("§7[StorageBox] §cAutoCollect changed OFF"), false);
             } else {
                 tag.remove("autoCollect");
-                player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCollect changed ON"), false);
+                player.sendMessage(TextUtil.literal("§7[StorageBox] §aAutoCollect changed ON"), false);
             }
             itemStack.setNbt(tag);
             return;
@@ -304,11 +304,11 @@ public class StorageBoxItem extends Item {
             NbtCompound tag = stack.getNbt();
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
-            tooltip.add(new LiteralText("§7Name: " + itemInBox.getItem().getName().getString()));
-            tooltip.add(new LiteralText("§7Unit: " + calcItemNumByUnit(count , false, itemInBox.getMaxCount()).toString()));
-            tooltip.add(new LiteralText("§7Items: " + count));
-            tooltip.add(new LiteralText("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
-            tooltip.add(new LiteralText("§7[Information]"));
+            tooltip.add(TextUtil.literal("§7Name: " + itemInBox.getItem().getName().getString()));
+            tooltip.add(TextUtil.literal("§7Unit: " + calcItemNumByUnit(count , false, itemInBox.getMaxCount()).toString()));
+            tooltip.add(TextUtil.literal("§7Items: " + count));
+            tooltip.add(TextUtil.literal("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
+            tooltip.add(TextUtil.literal("§7[Information]"));
         }
     }
 

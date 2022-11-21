@@ -8,7 +8,7 @@ import java.util.Map;
 public class StorageBoxUtil {
     // Forge版Storage Boxより
     // Map<(old_id, old_damage), id>
-    public static Map<OldItemId, String> convertIdMap = new HashMap<>() {
+    public static Map<OldItemId, String> convertIdMap = new HashMap<OldItemId, String>() {
         {
             put(new OldItemId("minecraft:stone", 1), "minecraft:granite");
             put(new OldItemId("minecraft:stone", 2), "minecraft:smooth_granite");

@@ -6,7 +6,8 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+
+import static ml.pkom.storagebox.StorageBoxItem.*;
 
 public class ItemRendererHooks {
 
@@ -20,10 +21,9 @@ public class ItemRendererHooks {
 
         if (stack.getItem() instanceof StorageBoxItem) {
             ClientWorld world = MinecraftClient.getInstance().world;
-            if (world != null && stack.hasNbt()) {
-                NbtCompound tag = stack.getNbt();
-                if (!tag.contains("item")) return false;
-                ItemStack renderStack = ItemStack.fromNbt(tag.getCompound("item")).copy();
+            if (world != null) {
+                if (!hasStackInStorageBox(stack)) return false;
+                ItemStack renderStack = getStackInStorageBox(stack).copy();
                 if (!renderStack.isEmpty()) {
                     renderStack.setCount(1);
                     BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()

@@ -3,8 +3,9 @@ package ml.pkom.storagebox;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.slot.Slot;
+
+import static ml.pkom.storagebox.StorageBoxItem.*;
 
 public class StorageBoxSlot extends Slot {
 
@@ -33,19 +34,15 @@ public class StorageBoxSlot extends Slot {
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
-            ItemStack handItem = player.getMainHandStack();
-            NbtCompound tag = handItem.getNbt();
-            if (tag == null) tag = new NbtCompound();
-            tag.remove("countInBox");
-            tag.remove("item");
-            handItem.setNbt(tag);
+            ItemStack storageBoxStack = player.getMainHandStack();
+            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
+            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
             return;
         }
-        ItemStack handItem = player.getMainHandStack();
-        NbtCompound tag = handItem.getNbt();
-        if (tag == null) tag = new NbtCompound();
-        tag.putInt("countInBox", itemStack.getCount());
-        tag.put("item", itemStack.writeNbt(new NbtCompound()));
-        handItem.setNbt(tag);
+        ItemStack storageBoxStack = player.getMainHandStack();
+        setItemStack(storageBoxStack, itemStack.copy());
+        setItemStackSize(storageBoxStack, itemStack.getCount());
     }
 }

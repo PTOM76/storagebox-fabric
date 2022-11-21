@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 public class StorageBoxMod implements ModInitializer
 {
+    // Origin: https://www.curseforge.com/minecraft/mc-mods/storagebox-mod
     public static String MOD_NAME = "StorageBox";
     public static String MOD_ID = "storagebox";
 
@@ -18,7 +19,6 @@ public class StorageBoxMod implements ModInitializer
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
     }
-
     private static Logger LOGGER = LogManager.getLogger();
 
     public static void log(Level level, String message){

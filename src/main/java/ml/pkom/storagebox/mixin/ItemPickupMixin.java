@@ -1,5 +1,6 @@
 package ml.pkom.storagebox.mixin;
 
+import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
 import ml.pkom.storagebox.StorageBoxSlot;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -41,8 +42,10 @@ public class ItemPickupMixin {
             }
         }
 
+        Boolean supportSimpleBackpack = ModConfig.getBoolean("SupportSimpleBackpack");
+        if (supportSimpleBackpack == null) supportSimpleBackpack = true;
         // SimpleBackpackのサポート
-        if (Registry.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
+        if (supportSimpleBackpack && Registry.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
                 nbt = nbt.getCompound("backpack");
@@ -56,8 +59,10 @@ public class ItemPickupMixin {
             }
         }
 
+        Boolean supportShulkerBox = ModConfig.getBoolean("SupportShulkerBox");
+        if (supportShulkerBox == null) supportShulkerBox = true;
         // シュルカーボックスのサポート
-        if (stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
+        if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
                 nbt = nbt.getCompound("BlockEntityTag");
@@ -77,6 +82,10 @@ public class ItemPickupMixin {
     @Inject(method = "onPlayerCollision", at = @At(value = "HEAD"), cancellable = true)
     private void onPickup(PlayerEntity player, CallbackInfo ci) {
         ItemEntity itemEntity = (ItemEntity) (Object) this;
+
+        Boolean supportEnderChest = ModConfig.getBoolean("SupportEnderChest");
+        if (supportEnderChest == null) supportEnderChest = true;
+
         if (!itemEntity.world.isClient) {
             ItemStack itemStack = itemEntity.getStack();
             Item item = itemStack.getItem();
@@ -88,7 +97,7 @@ public class ItemPickupMixin {
                 // インベントリ
                 for (ItemStack inStack : player.getInventory().main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
-                    if (inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
+                    if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
                         for (ItemStack enderChestStack : player.getEnderChestInventory().stacks) {
                             if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
@@ -101,8 +110,6 @@ public class ItemPickupMixin {
                         }
                     }
                     if (inStack.hasNbt()) {
-                        //System.out.println("a");
-
                         if (process(inStack, itemStack)) {
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;

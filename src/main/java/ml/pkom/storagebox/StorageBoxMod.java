@@ -18,6 +18,8 @@ public class StorageBoxMod implements ModInitializer
         Registry.register(Registry.ITEM, id("storagebox"), StorageBoxItem.instance);
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
+
+        ModConfig.init();
     }
     private static Logger LOGGER = LogManager.getLogger();
 

@@ -39,6 +39,7 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
         x = (this.width - this.backgroundWidth) / 2;
         y = (this.height - this.backgroundHeight) / 2;
         this.textRenderer.draw(matrices, TextUtil.translatable("item.storagebox.storage"), 8, 20, 4210752);
+        this.textRenderer.draw(matrices, TextUtil.translatable("item.storagebox.storagebox"), 8, 6, 4210752);
     }
 
     @Override

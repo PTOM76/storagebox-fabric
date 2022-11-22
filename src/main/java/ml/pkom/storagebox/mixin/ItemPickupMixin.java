@@ -17,7 +17,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,8 +25,6 @@ import static ml.pkom.storagebox.StorageBoxItem.*;
 
 @Mixin(ItemEntity.class)
 public class ItemPickupMixin {
-
-    @Shadow private int pickupDelay;
 
     private static boolean process(ItemStack stack, ItemStack pickupStack) {
         // ストレージボックス
@@ -98,7 +95,8 @@ public class ItemPickupMixin {
                 for (ItemStack inStack : player.getInventory().main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
-                        for (ItemStack enderChestStack : player.getEnderChestInventory().stacks) {
+                        for (int i = 0; i < player.getEnderChestInventory().size(); i++) {
+                            ItemStack enderChestStack = player.getEnderChestInventory().getStack(i);
                             if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;

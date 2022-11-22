@@ -1,6 +1,5 @@
 package ml.pkom.storagebox;
 
-import ml.pkom.mcpitanlib.api.text.TextUtil;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
@@ -14,6 +13,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -188,9 +188,9 @@ public class StorageBoxItem extends Item {
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
-            player.sendMessage(TextUtil.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getItemDataAsInt(storageBoxStack, KEY_SIZE), true, stack.getMaxCount())), true);
+            player.sendMessage(new LiteralText(stack.getName().getString() + "/" + calcItemNumByUnit(getItemDataAsInt(storageBoxStack, KEY_SIZE), true, stack.getMaxCount())), true);
         } else {
-            player.sendMessage(TextUtil.literal("Empty"), true);
+            player.sendMessage(new LiteralText("Empty"), true);
         }
     }
 
@@ -279,7 +279,7 @@ public class StorageBoxItem extends Item {
             return canUse ? TypedActionResult.success(storageBoxStack) : TypedActionResult.pass(storageBoxStack);
         }
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), TextUtil.literal(""));
+            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), new LiteralText(""));
             user.openHandledScreen(screenHandlerFactory);
         }
         return TypedActionResult.success(storageBoxStack);
@@ -556,10 +556,10 @@ public class StorageBoxItem extends Item {
         if (type == 3) {
             if (isAutoCollect(storageBoxStack)) {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(TextUtil.literal("§7[StorageBox] §cAutoCollect changed OFF"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCollect changed OFF"), false);
             } else {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(TextUtil.literal("§7[StorageBox] §aAutoCollect changed ON"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCollect changed ON"), false);
             }
         }
     }
@@ -571,11 +571,11 @@ public class StorageBoxItem extends Item {
             Item item = getItem(storageBoxStack);
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
-            tooltip.add(TextUtil.literal("§7Name: " + stack.getItem().getName().getString()));
-            tooltip.add(TextUtil.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
-            tooltip.add(TextUtil.literal("§7Items: " + count));
-            tooltip.add(TextUtil.literal("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
-            tooltip.add(TextUtil.literal("§7[Information]"));
+            tooltip.add(new LiteralText("§7Name: " + stack.getItem().getName().getString()));
+            tooltip.add(new LiteralText("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
+            tooltip.add(new LiteralText("§7Items: " + count));
+            tooltip.add(new LiteralText("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
+            tooltip.add(new LiteralText("§7[Information]"));
             if (item != null)
                 item.appendTooltip(stack, world, tooltip, context);
         }

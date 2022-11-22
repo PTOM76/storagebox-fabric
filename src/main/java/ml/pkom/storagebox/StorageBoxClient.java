@@ -74,7 +74,7 @@ public class StorageBoxClient implements ClientModInitializer {
             }
             if (client.player != null) {
                 PlayerEntity player = client.player;
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt())
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem)
                     StorageBoxItem.showBar(player, player.getMainHandStack());
             }
             coolDown--;

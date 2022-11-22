@@ -33,12 +33,6 @@ public class StorageBoxClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (isKeyPressed()) {
                 PlayerEntity player = client.player;
-                if (player == null) {
-                    return;
-                }
-                if (player.getMainHandStack() == null) {
-                    return;
-                }
                 if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt()) {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
@@ -74,7 +68,7 @@ public class StorageBoxClient implements ClientModInitializer {
             }
             if (client.player != null) {
                 PlayerEntity player = client.player;
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem)
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt())
                     StorageBoxItem.showBar(player, player.getMainHandStack());
             }
             coolDown--;

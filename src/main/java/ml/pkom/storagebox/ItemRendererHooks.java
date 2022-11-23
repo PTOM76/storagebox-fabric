@@ -20,7 +20,6 @@ public class ItemRendererHooks {
         if (stack.getItem() instanceof StorageBoxItem) {
             ClientWorld world = MinecraftClient.getInstance().world;
             if (world != null && StorageBoxItem.hasNBT(stack)) {
-                //CompoundTag tag = stack.getTag();
                 if (!StorageBoxItem.hasItemNBT(stack)) return false;
                 ItemStack renderStack = StorageBoxItem.getStackInBox(stack).copy();
                 if (!renderStack.isEmpty()) {

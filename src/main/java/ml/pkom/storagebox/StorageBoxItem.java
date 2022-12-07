@@ -127,7 +127,7 @@ public class StorageBoxItem extends Item {
     public static boolean isAutoCollect(ItemStack storageBoxStack) {
         if (storageBoxStack.hasNbt()) {
             NbtCompound nbt = storageBoxStack.getNbt();
-            if (nbt.contains("autoCollect")) {
+            if (!nbt.contains(KEY_AUTO) && nbt.contains("autoCollect")) {
                 return nbt.getBoolean("autoCollect");
             }
         }

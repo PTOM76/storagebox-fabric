@@ -1,14 +1,12 @@
 package ml.pkom.storagebox;
 
 import ml.pkom.mcpitanlib.api.text.TextUtil;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -116,7 +114,7 @@ public class StorageBoxItem extends Item {
 
             data = nbt.getInt(key);
         }
-        if (key.equals(KEY_AUTO)) {
+        if (key.equals(KEY_AUTO) && (nbt == null || !nbt.contains(key))) {
             // 0 = true, 1 = false
             Boolean defaultAutoCollect = ModConfig.getBoolean("DefaultAutoCollect");
             if (defaultAutoCollect == null) return 0;
@@ -183,7 +181,9 @@ public class StorageBoxItem extends Item {
     public static StorageBoxItem instance = new StorageBoxItem(new Settings());
 
     public StorageBoxItem(Settings settings) {
-        super(settings.group(ItemGroup.MISC).maxCount(1));
+        super(settings.maxCount(1));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(this));
+
     }
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {

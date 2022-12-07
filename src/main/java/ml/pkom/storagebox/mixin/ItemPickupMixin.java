@@ -12,10 +12,10 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -45,7 +45,7 @@ public class ItemPickupMixin {
         Boolean supportSimpleBackpack = ModConfig.getBoolean("SupportSimpleBackpack");
         if (supportSimpleBackpack == null) supportSimpleBackpack = true;
         // SimpleBackpackのサポート
-        if (supportSimpleBackpack && Registry.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
+        if (supportSimpleBackpack && Registries.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
                 nbt = nbt.getCompound("backpack");

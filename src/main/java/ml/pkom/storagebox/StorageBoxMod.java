@@ -1,8 +1,9 @@
 package ml.pkom.storagebox;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,7 +16,7 @@ public class StorageBoxMod implements ModInitializer
 
     @Override
     public void onInitialize() {
-        Registry.register(Registry.ITEM, id("storagebox"), StorageBoxItem.instance);
+        Registry.register(Registries.ITEM, id("storagebox"), StorageBoxItem.instance);
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
 

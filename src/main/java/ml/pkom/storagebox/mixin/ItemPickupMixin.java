@@ -35,6 +35,7 @@ public class ItemPickupMixin {
             ItemStack storageBoxStack = stack;
             if (!StorageBoxItem.isAutoCollect(storageBoxStack)) return false;
             ItemStack stackInNbt = getStackInStorageBox(storageBoxStack);
+            if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxSlot.canInsertStack(pickupStack)) return false;
                 setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) + pickupStack.getCount());

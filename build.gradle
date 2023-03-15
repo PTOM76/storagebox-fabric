@@ -1,7 +1,12 @@
 plugins {
 	id 'fabric-loom' version '1.0-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.matthewprenger.cursegradle' version '1.+'
+	id "com.modrinth.minotaur" version "2.+"
 }
+
+apply plugin: "com.modrinth.minotaur"
+apply plugin: "com.matthewprenger.cursegradle"
 
 sourceCompatibility = JavaVersion.VERSION_16
 targetCompatibility = JavaVersion.VERSION_16
@@ -33,6 +38,41 @@ dependencies {
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
+}
+
+if (System.getenv("CURSEFORGE_TOKEN") != null) {
+	curseforge {
+		apiKey = System.getenv("CURSEFORGE_TOKEN")
+		project {
+			id = '517673'
+			changelog = project.changelog
+			releaseType = 'release'
+			addGameVersion "Fabric"
+			addGameVersion project.minecraft_version
+			relations {
+				requiredDependency "fabric-api"
+				optionalDependency "simple-backpack-fabric"
+			}
+
+			mainArtifact(tasks.remapJar)
+		}
+	}
+}
+
+if (System.getenv("MODRINTH_TOKEN") != null) {
+	modrinth {
+		token = System.getenv("MODRINTH_TOKEN")
+		projectId = 'styMEyoE'
+		versionNumber = project.mod_version + "-fabric"
+		gameVersions = [project.minecraft_version]
+		versionType = 'release'
+		uploadFile = tasks.remapJar
+		changelog = project.changelog
+		loaders = ["fabric"]
+		dependencies {
+			required.project "P7dR8mSH" // Fabric API
+		}
+	}
 }
 
 def targetJavaVersion = 8

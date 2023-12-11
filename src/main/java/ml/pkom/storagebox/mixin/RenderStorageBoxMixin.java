@@ -3,6 +3,7 @@ package ml.pkom.storagebox.mixin;
 import ml.pkom.storagebox.ItemRendererHooks;
 import ml.pkom.storagebox.StorageBoxItem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
@@ -24,9 +25,9 @@ public abstract class RenderStorageBoxMixin {
 
     @Shadow public abstract void renderItem(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model);
 
-    @Inject(method = "renderGuiItemModel", at = @At("HEAD"), cancellable = true)
-    protected void renderGuiItemModel(MatrixStack matrices, ItemStack stack, int x, int y, BakedModel model, CallbackInfo ci) {
-        if (ItemRendererHooks.onRenderItemModel((ItemRenderer) (Object) this, matrices, stack, x, y, model)) {
+    @Inject(method = "renderBakedItemModel", at = @At("HEAD"), cancellable = true)
+    protected void renderGuiItemModel(BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices, CallbackInfo ci) {
+        if (ItemRendererHooks.onRenderItemModel((ItemRenderer) (Object) this, model, stack, light, overlay, matrices, vertices)) {
             ci.cancel();
         }
     }

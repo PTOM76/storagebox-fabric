@@ -87,7 +87,7 @@ public class ItemPickupMixin {
         Boolean supportEnderChest = ModConfig.getBoolean("SupportEnderChest");
         if (supportEnderChest == null) supportEnderChest = true;
 
-        if (!itemEntity.world.isClient) {
+        if (!itemEntity.getWorld().isClient) {
             ItemStack itemStack = itemEntity.getStack();
             Item item = itemStack.getItem();
             int count = itemStack.getCount();
@@ -99,7 +99,7 @@ public class ItemPickupMixin {
                 for (ItemStack inStack : player.getInventory().main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
-                        for (ItemStack enderChestStack : player.getEnderChestInventory().stacks) {
+                        for (ItemStack enderChestStack : player.getEnderChestInventory().getHeldStacks()) {
                             if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;

@@ -2,6 +2,7 @@ package ml.pkom.storagebox;
 
 import ml.pkom.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -14,8 +15,7 @@ public class ItemRendererHooks {
 
     private static final ThreadLocal<ItemStack> OVERRIDING_FOR = new ThreadLocal<>();
 
-    public static boolean onRenderItemModel(ItemRenderer renderer, MatrixStack matrices, ItemStack stack, int x, int y,
-                                            BakedModel model) {
+    public static boolean onRenderItemModel(ItemRenderer renderer, BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
         if (OVERRIDING_FOR.get() == stack) {
             return false;
         }
@@ -31,7 +31,7 @@ public class ItemRendererHooks {
                             .getModel(renderStack);
                     OVERRIDING_FOR.set(stack);
                     try {
-                        ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(matrices, stack, x, y, realModel);
+                        ((ItemRendererAccessor) renderer).invokeRenderBakedItemModel(realModel, stack, light, overlay, matrices, vertices);
                     } finally {
                         OVERRIDING_FOR.remove();
                     }

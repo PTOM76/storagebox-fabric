@@ -1,6 +1,5 @@
 package ml.pkom.storagebox;
 
-import ml.pkom.mcpitanlib.api.text.TextUtil;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
@@ -188,9 +187,9 @@ public class StorageBoxItem extends Item {
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
-            player.sendMessage(TextUtil.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getItemDataAsInt(storageBoxStack, KEY_SIZE), true, stack.getMaxCount())), true);
+            player.sendMessage(Text.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getItemDataAsInt(storageBoxStack, KEY_SIZE), true, stack.getMaxCount())), true);
         } else {
-            player.sendMessage(TextUtil.literal("Empty"), true);
+            player.sendMessage(Text.literal("Empty"), true);
         }
     }
 
@@ -245,7 +244,7 @@ public class StorageBoxItem extends Item {
 
             if (result.getResult() == ActionResult.FAIL) {
                 return new TypedActionResult<>(result.getResult(), storageBoxStack);
-            } else if (stack.isItemEqual(result.getValue())) {
+            } else if (stack.getItem().equals(result.getValue().getItem())) {
                 // 食べ物など一定の時間を使って消費するアイテム
                 if (user.isUsingItem()) {
                     user.stopUsingItem();
@@ -279,7 +278,7 @@ public class StorageBoxItem extends Item {
             return canUse ? TypedActionResult.success(storageBoxStack) : TypedActionResult.pass(storageBoxStack);
         }
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), TextUtil.literal(""));
+            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory((id, playerInv, player) -> new StorageBoxScreenHandler(id, playerInv, player), Text.literal(""));
             user.openHandledScreen(screenHandlerFactory);
         }
         return TypedActionResult.success(storageBoxStack);
@@ -294,7 +293,7 @@ public class StorageBoxItem extends Item {
             ItemStack result = item.finishUsing(stack, world, user);
 
             // ポーション => ガラス瓶などのサポート
-            if (!stack.isItemEqual(result))
+            if (!stack.getItem().equals((result.getItem())))
                 dropItemStack(user, result);
             setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) - (64 - stack.getCount()));
         }
@@ -556,10 +555,10 @@ public class StorageBoxItem extends Item {
         if (type == 3) {
             if (isAutoCollect(storageBoxStack)) {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(TextUtil.literal("§7[StorageBox] §cAutoCollect changed OFF"), false);
+                player.sendMessage(Text.literal("§7[StorageBox] §cAutoCollect changed OFF"), false);
             } else {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(TextUtil.literal("§7[StorageBox] §aAutoCollect changed ON"), false);
+                player.sendMessage(Text.literal("§7[StorageBox] §aAutoCollect changed ON"), false);
             }
         }
     }
@@ -571,11 +570,11 @@ public class StorageBoxItem extends Item {
             Item item = getItem(storageBoxStack);
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
-            tooltip.add(TextUtil.literal("§7Name: " + stack.getItem().getName().getString()));
-            tooltip.add(TextUtil.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
-            tooltip.add(TextUtil.literal("§7Items: " + count));
-            tooltip.add(TextUtil.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
-            tooltip.add(TextUtil.literal("§7[Information]"));
+            tooltip.add(Text.literal("§7Name: " + stack.getItem().getName().getString()));
+            tooltip.add(Text.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
+            tooltip.add(Text.literal("§7Items: " + count));
+            tooltip.add(Text.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
+            tooltip.add(Text.literal("§7[Information]"));
             if (item != null)
                 item.appendTooltip(stack, world, tooltip, context);
         }

@@ -25,7 +25,7 @@ public class StorageBoxSlot extends Slot {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (stack.hasNbt()) return false;
+        if (stack.hasTag()) return false;
         return true;
     }
 
@@ -34,18 +34,18 @@ public class StorageBoxSlot extends Slot {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack handItem = player.getMainHandStack();
-            NbtCompound tag = handItem.getNbt();
+            NbtCompound tag = handItem.getTag();
             if (tag == null) tag = new NbtCompound();
             tag.remove("countInBox");
             tag.remove("item");
-            handItem.setNbt(tag);
+            handItem.setTag(tag);
             return;
         }
         ItemStack handItem = player.getMainHandStack();
-        NbtCompound tag = handItem.getNbt();
+        NbtCompound tag = handItem.getTag();
         if (tag == null) tag = new NbtCompound();
         tag.putInt("countInBox", itemStack.getCount());
         tag.put("item", itemStack.writeNbt(new NbtCompound()));
-        handItem.setNbt(tag);
+        handItem.setTag(tag);
     }
 }

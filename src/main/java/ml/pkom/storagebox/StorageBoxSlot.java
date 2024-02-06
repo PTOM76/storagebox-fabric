@@ -26,7 +26,7 @@ public class StorageBoxSlot extends Slot {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (stack.hasNbt()) return false;
+        if (stack.hasTag()) return false;
         return true;
     }
 

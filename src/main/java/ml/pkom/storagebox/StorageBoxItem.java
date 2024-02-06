@@ -60,8 +60,8 @@ public class StorageBoxItem extends Item {
 
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
         ItemStack result;
-        if (!storageBoxStack.hasNbt()) return null;
-        NbtCompound nbt = storageBoxStack.getNbt();
+        if (!storageBoxStack.hasTag()) return null;
+        NbtCompound nbt = storageBoxStack.getTag();
 
         // 以前のシステムとの互換性
         if (nbt.contains("item")) {
@@ -71,7 +71,7 @@ public class StorageBoxItem extends Item {
                 nbt.remove("countInBox");
             }
             nbt.remove("item");
-            storageBoxStack.setNbt(nbt);
+            storageBoxStack.setTag(nbt);
         }
         if (nbt.contains(KEY_ITEM_ID)) {
             int itemId = getItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
@@ -105,7 +105,7 @@ public class StorageBoxItem extends Item {
     public static int getItemDataAsInt(ItemStack storageBoxStack, String key) {
 
         int data = 0;
-        NbtCompound nbt = storageBoxStack.getNbt();
+        NbtCompound nbt = storageBoxStack.getTag();
 
         if (nbt != null) {
             if (key.equals(KEY_SIZE) && nbt.contains("countInBox"))
@@ -124,8 +124,8 @@ public class StorageBoxItem extends Item {
     }
 
     public static boolean isAutoCollect(ItemStack storageBoxStack) {
-        if (storageBoxStack.hasNbt()) {
-            NbtCompound nbt = storageBoxStack.getNbt();
+        if (storageBoxStack.hasTag()) {
+            NbtCompound nbt = storageBoxStack.getTag();
             if (!nbt.contains(KEY_AUTO) && nbt.contains("autoCollect")) {
                 return nbt.getBoolean("autoCollect");
             }
@@ -139,21 +139,21 @@ public class StorageBoxItem extends Item {
     }
 
     public static void setItemDataAsInt(ItemStack storageBoxStack, String key, int data) {
-        NbtCompound stackNbt = storageBoxStack.getNbt();
+        NbtCompound stackNbt = storageBoxStack.getTag();
         if (stackNbt == null) stackNbt = new NbtCompound();
 
         stackNbt.putInt(key, data);
-        storageBoxStack.setNbt(stackNbt);
+        storageBoxStack.setTag(stackNbt);
     }
 
     public static void setItemDataAsInt(ItemStack storageBoxStack, String key, NbtCompound nbt) {
-        NbtCompound stackNbt = storageBoxStack.getNbt();
+        NbtCompound stackNbt = storageBoxStack.getTag();
         if (stackNbt == null) stackNbt = new NbtCompound();
 
         if (nbt != null)
             stackNbt.put(key, nbt);
         else if (stackNbt.contains(key)) stackNbt.remove(key);
-        storageBoxStack.setNbt(stackNbt);
+        storageBoxStack.setTag(stackNbt);
     }
 
     public static void removeItemDataAsInt(ItemStack stack, String key) {
@@ -242,7 +242,7 @@ public class StorageBoxItem extends Item {
             } else {
                 // バケツ => 液体バケツなどのサポート
                 if (!result.getValue().isEmpty())
-                    user.getInventory().offerOrDrop(result.getValue());
+                    user.inventory.offerOrDrop(world, result.getValue());
                 if (result.getResult().equals(ActionResult.CONSUME)) {
                     stack.setCount(stack.getCount() - 1);
                 }
@@ -429,7 +429,7 @@ public class StorageBoxItem extends Item {
                     ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                     int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
                     for (Slot slot : player.currentScreenHandler.slots) {
-                        if (slot.inventory == player.getInventory()) continue;
+                        if (slot.inventory == player.inventory) continue;
                         ItemStack stack = slot.getStack();
                         if (!stack.isEmpty()) continue;
                         ItemStack newStack = itemInBox.copy();
@@ -459,7 +459,7 @@ public class StorageBoxItem extends Item {
                 ItemStack giveStack = itemInBox.copy();
                 if (count > 64) {
                     giveStack.setCount(64);
-                    if (canGive(player.getInventory().main)) {
+                    if (canGive(player.inventory.main)) {
                         player.giveItemStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
@@ -467,7 +467,7 @@ public class StorageBoxItem extends Item {
                     setItemStackSize(storageBoxStack, count - 64);
                 } else {
                     giveStack.setCount(count);
-                    if (canGive(player.getInventory().main)) {
+                    if (canGive(player.inventory.main)) {
                         player.giveItemStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
@@ -506,12 +506,12 @@ public class StorageBoxItem extends Item {
                     ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                     int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
                     for (Slot slot : player.currentScreenHandler.slots) {
-                        if (slot.inventory == player.getInventory()) continue;
+                        if (slot.inventory == player.inventory) continue;
                         ItemStack stack = slot.getStack();
                         if (stack.getItem() == itemInBox.getItem()) {
                             if (!StorageBoxSlot.canInsertStack(stack)) continue;
                             count += stack.getCount();
-                            player.getInventory().removeOne(stack);
+                            player.inventory.removeOne(stack);
                             stack.setCount(0);
                             stack = ItemStack.EMPTY;
                             slot.setStack(stack);
@@ -524,11 +524,11 @@ public class StorageBoxItem extends Item {
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                 int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
-                for (ItemStack stack : player.getInventory().main) {
+                for (ItemStack stack : player.inventory.main) {
                     if (stack.getItem() == itemInBox.getItem()) {
                         if (!StorageBoxSlot.canInsertStack(stack)) continue;
                         count += stack.getCount();
-                        player.getInventory().removeOne(stack);
+                        player.inventory.removeOne(stack);
                         stack.setCount(0);
                     }
                 }

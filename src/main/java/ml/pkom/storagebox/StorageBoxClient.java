@@ -36,7 +36,7 @@ public class StorageBoxClient implements ClientModInitializer {
                 if (player == null) return;
                 if (player.getMainHandStack() == null) return;
 
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt()) {
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasTag()) {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)

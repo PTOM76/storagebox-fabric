@@ -29,7 +29,7 @@ public class StorageBoxItem extends Item {
     }
 
     public static void showBar(PlayerEntity player, ItemStack stack) {
-        NbtCompound tag = stack.getNbt();
+        NbtCompound tag = stack.getTag();
         if (tag != null) if (tag.contains("item")) {
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             player.sendMessage(new LiteralText(itemInBox.getName().getString() + "/" + instance.calcItemNumByUnit(tag.getInt("countInBox"), false, itemInBox.getMaxCount())), true);
@@ -39,7 +39,7 @@ public class StorageBoxItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack itemStack = user.getStackInHand(hand);
-        NbtCompound tag = itemStack.getNbt();
+        NbtCompound tag = itemStack.getTag();
         if (tag != null) if (tag.contains("item")) {
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             boolean canUse = true;
@@ -95,7 +95,7 @@ public class StorageBoxItem extends Item {
                     tag.putInt("countInBox", countInBox);
                     tag.put("item", itemInBox.writeNbt(new NbtCompound()));
                 }
-                itemStack.setNbt(tag);
+                itemStack.setTag(tag);
             }
             return canUse ? TypedActionResult.success(itemStack) : TypedActionResult.pass(itemStack);
         }
@@ -114,7 +114,7 @@ public class StorageBoxItem extends Item {
         Hand hand = context.getHand();
 
         ItemStack itemStack = user.getStackInHand(hand);
-        NbtCompound tag = itemStack.getNbt();
+        NbtCompound tag = itemStack.getTag();
         if (tag != null) if (tag.contains("item")) {
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             boolean canUse = true;
@@ -163,7 +163,7 @@ public class StorageBoxItem extends Item {
                     tag.putInt("countInBox", countInBox);
                     tag.put("item", itemInBox.writeNbt(new NbtCompound()));
                 }
-                itemStack.setNbt(tag);
+                itemStack.setTag(tag);
             }
             return canUse ? ActionResult.SUCCESS : ActionResult.PASS;
         }
@@ -174,11 +174,11 @@ public class StorageBoxItem extends Item {
     public void keyboardEvent(int type, PlayerEntity player, ItemStack itemStack) {
         if (type == 0) {
             if (player.currentScreenHandler != null && !(player.currentScreenHandler instanceof PlayerScreenHandler) && !(player.currentScreenHandler.slots.size() <= 0)) {
-                NbtCompound tag = itemStack.getNbt();
+                NbtCompound tag = itemStack.getTag();
                 ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
                 int count = tag.getInt("countInBox");
                 for (Slot slot : player.currentScreenHandler.slots) {
-                    if (slot.inventory == player.getInventory()) continue;
+                    if (slot.inventory == player.inventory) continue;
                     ItemStack stack = slot.getStack();
                     if (!stack.isEmpty()) continue;
                     // 64より大きい
@@ -199,16 +199,16 @@ public class StorageBoxItem extends Item {
                 }
                 if (tag.contains("item"))
                     tag.putInt("countInBox", count);
-                itemStack.setNbt(tag);
+                itemStack.setTag(tag);
                 return;
             }
-            NbtCompound tag = itemStack.getNbt();
+            NbtCompound tag = itemStack.getTag();
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
             ItemStack giveStack = itemInBox.copy();
             if (count > 64) {
                 giveStack.setCount(64);
-                if (canGive(player.getInventory().main)) {
+                if (canGive(player.inventory.main)) {
                     player.giveItemStack(giveStack);
                 } else {
                     player.dropItem(giveStack, false);
@@ -216,7 +216,7 @@ public class StorageBoxItem extends Item {
                 tag.putInt("countInBox", count - 64);
             } else {
                 giveStack.setCount(count);
-                if (canGive(player.getInventory().main)) {
+                if (canGive(player.inventory.main)) {
                     player.giveItemStack(giveStack);
                 } else {
                     player.dropItem(giveStack, false);
@@ -224,11 +224,11 @@ public class StorageBoxItem extends Item {
                 tag.remove("item");
                 if (tag.contains("autoCollect")) tag.remove("autoCollect");
             }
-            itemStack.setNbt(tag);
+            itemStack.setTag(tag);
             return;
         }
         if (type == 1) {
-            NbtCompound tag = itemStack.getNbt();
+            NbtCompound tag = itemStack.getTag();
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
             ItemStack dropStack = itemInBox.copy();
@@ -243,48 +243,48 @@ public class StorageBoxItem extends Item {
                 tag.remove("item");
                 if (tag.contains("autoCollect")) tag.remove("autoCollect");
             }
-            itemStack.setNbt(tag);
+            itemStack.setTag(tag);
             return;
         }
         if (type == 2) {
             if (!(player.currentScreenHandler instanceof PlayerScreenHandler) && player.currentScreenHandler != null) {
-                NbtCompound tag = itemStack.getNbt();
+                NbtCompound tag = itemStack.getTag();
                 ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
                 int count = tag.getInt("countInBox");
                 for (Slot slot : player.currentScreenHandler.slots) {
-                    if (slot.inventory == player.getInventory()) continue;
+                    if (slot.inventory == player.inventory) continue;
                     ItemStack stack = slot.getStack();
                     if (stack.getItem() == itemInBox.getItem()) {
                         if (!StorageBoxSlot.canInsertStack(stack)) continue;
                         count += stack.getCount();
-                        player.getInventory().removeOne(stack);
+                        player.inventory.removeOne(stack);
                         stack.setCount(0);
                         stack = ItemStack.EMPTY;
                         slot.setStack(stack);
                     }
                 }
                 tag.putInt("countInBox", count);
-                itemStack.setNbt(tag);
+                itemStack.setTag(tag);
                 return;
             }
-            NbtCompound tag = itemStack.getNbt();
+            NbtCompound tag = itemStack.getTag();
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
-            for (ItemStack stack : player.getInventory().main) {
+            for (ItemStack stack : player.inventory.main) {
                 if (stack.getItem() == itemInBox.getItem()) {
                     if (!StorageBoxSlot.canInsertStack(stack)) continue;
                     count += stack.getCount();
-                    player.getInventory().removeOne(stack);
+                    player.inventory.removeOne(stack);
                     stack.setCount(0);
                     stack = ItemStack.EMPTY;
                 }
             }
             tag.putInt("countInBox", count);
-            itemStack.setNbt(tag);
+            itemStack.setTag(tag);
             return;
         }
         if (type == 3) {
-            NbtCompound tag = itemStack.getNbt();
+            NbtCompound tag = itemStack.getTag();
             if (isAutoCollect(itemStack)) {
                 tag.putBoolean("autoCollect", false);
                 player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCorrect changed OFF"), false);
@@ -292,7 +292,7 @@ public class StorageBoxItem extends Item {
                 tag.remove("autoCollect");
                 player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCorrect changed ON"), false);
             }
-            itemStack.setNbt(tag);
+            itemStack.setTag(tag);
             return;
         }
     }
@@ -300,8 +300,8 @@ public class StorageBoxItem extends Item {
     @Override
     public void appendTooltip(ItemStack stack, World world, List<Text> tooltip, TooltipContext context) {
         super.appendTooltip(stack, world, tooltip, context);
-        if (stack.hasNbt()) {
-            NbtCompound tag = stack.getNbt();
+        if (stack.hasTag()) {
+            NbtCompound tag = stack.getTag();
             ItemStack itemInBox = ItemStack.fromNbt(tag.getCompound("item"));
             int count = tag.getInt("countInBox");
             tooltip.add(new LiteralText("§7Name: " + itemInBox.getItem().getName().getString()));
@@ -346,7 +346,7 @@ public class StorageBoxItem extends Item {
     }
 
     public static boolean isAutoCollect(ItemStack stack) {
-        NbtCompound tag = stack.getNbt();
+        NbtCompound tag = stack.getTag();
         boolean autoCollect = true;
         if (tag.contains("autoCollect")) {
             autoCollect = tag.getBoolean("autoCollect");

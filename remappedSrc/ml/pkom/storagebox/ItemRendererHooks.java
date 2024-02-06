@@ -20,8 +20,8 @@ public class ItemRendererHooks {
 
         if (stack.getItem() instanceof StorageBoxItem) {
             ClientWorld world = MinecraftClient.getInstance().world;
-            if (world != null && stack.hasNbt()) {
-                NbtCompound tag = stack.getNbt();
+            if (world != null && stack.hasTag()) {
+                NbtCompound tag = stack.getTag();
                 if (!tag.contains("item")) return false;
                 ItemStack renderStack = ItemStack.fromNbt(tag.getCompound("item")).copy();
                 if (!renderStack.isEmpty()) {

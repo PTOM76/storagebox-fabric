@@ -4,7 +4,6 @@ import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
 import ml.pkom.storagebox.StorageBoxSlot;
 import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -46,7 +45,7 @@ public class ItemPickupMixin {
         if (supportSimpleBackpack == null) supportSimpleBackpack = true;
         // SimpleBackpackのサポート
         if (supportSimpleBackpack && Registry.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
-            NbtCompound nbt = stack.getNbt();
+            NbtCompound nbt = stack.getTag();
             if (nbt.contains("backpack")) {
                 NbtCompound backpackNbt = nbt.getCompound("backpack");
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(54, ItemStack.EMPTY);
@@ -60,7 +59,7 @@ public class ItemPickupMixin {
                         items.set(i, inStack);
                         Inventories.writeNbt(backpackNbt, items);
                         nbt.put("backpack", backpackNbt);
-                        stack.setNbt(nbt);
+                        stack.setTag(nbt);
                         return true;
                     }
                 }
@@ -71,10 +70,10 @@ public class ItemPickupMixin {
         if (supportShulkerBox == null) supportShulkerBox = true;
         // シュルカーボックスのサポート
         if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
-            NbtCompound nbt = stack.getNbt();
+            NbtCompound nbt = stack.getTag();
             if (nbt.contains("BlockEntityTag")) {
                 NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.field_31356, ItemStack.EMPTY);
+                DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
                 Inventories.readNbt(tileNbt, items);
 
                 int i;
@@ -85,7 +84,7 @@ public class ItemPickupMixin {
                         items.set(i, inStack);
                         Inventories.writeNbt(tileNbt, items);
                         nbt.put("BlockEntityTag", tileNbt);
-                        stack.setNbt(nbt);
+                        stack.setTag(nbt);
                         return true;
                     }
                 }
@@ -111,12 +110,12 @@ public class ItemPickupMixin {
                 boolean insertedBox = false;
                 boolean checkedEnderChest = false;
                 // インベントリ
-                for (ItemStack inStack : player.getInventory().main) {
+                for (ItemStack inStack : player.inventory.main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
                         for (int i = 0; i < player.getEnderChestInventory().size(); i++) {
                             ItemStack enderChestStack = player.getEnderChestInventory().getStack(i);
-                            if (enderChestStack.hasNbt()) {
+                            if (enderChestStack.hasTag()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;
                                     itemStack = ItemStack.EMPTY;
@@ -126,7 +125,7 @@ public class ItemPickupMixin {
                             }
                         }
                     }
-                    if (inStack.hasNbt()) {
+                    if (inStack.hasTag()) {
                         if (process(inStack, itemStack)) {
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;
@@ -137,7 +136,7 @@ public class ItemPickupMixin {
 
                 if (!insertedBox) {
                     // オフハンド
-                    if (player.getOffHandStack().hasNbt()) {
+                    if (player.getOffHandStack().hasTag()) {
                         if (process(player.getOffHandStack(), itemStack)) {
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;
@@ -148,12 +147,12 @@ public class ItemPickupMixin {
                 if (insertedBox) {
                     player.sendPickup(itemEntity, count);
                     if (itemStack.isEmpty()) {
-                        itemEntity.discard();
+                        itemEntity.remove();
                         itemStack.setCount(count);
                     }
 
                     player.increaseStat(Stats.PICKED_UP.getOrCreateStat(item), count);
-                    player.triggerItemPickedUpByEntityCriteria(itemEntity);
+                    player.method_29499(itemEntity);
                     ci.cancel();
                 }
             }

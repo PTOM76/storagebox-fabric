@@ -17,6 +17,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.registry.Registry;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,6 +27,7 @@ import static ml.pkom.storagebox.StorageBoxItem.*;
 @Mixin(ItemEntity.class)
 public class ItemPickupMixin {
 
+    @Unique
     private static boolean process(ItemStack stack, ItemStack pickupStack) {
         // ストレージボックス
         if (stack.getItem() instanceof StorageBoxItem) {

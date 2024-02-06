@@ -1,9 +1,9 @@
 package ml.pkom.storagebox;
 
+import net.minecraft.container.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
 
 import static ml.pkom.storagebox.StorageBoxItem.*;
 

@@ -7,7 +7,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.stat.Stats;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,7 +30,7 @@ public class ItemPickupMixin {
                     ItemStack itemStack2 = player.inventory.getStack(i);
                     if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
                         if (!StorageBoxItem.isAutoCollect(itemStack2)) continue;
-                        NbtCompound tag = itemStack2.getTag();
+                        CompoundTag tag = itemStack2.getTag();
                         ItemStack stackInTag = ItemStack.fromNbt(tag.getCompound("item"));
                         if (stackInTag.getItem() == itemStack.getItem()) {
                             if (!StorageBoxSlot.canInsertStack(itemStack)) continue;
@@ -46,7 +46,7 @@ public class ItemPickupMixin {
                     ItemStack itemStack2 = player.getOffHandStack();
                     if (itemStack2.getItem() instanceof StorageBoxItem) if (itemStack2.hasTag()) {
                         if (StorageBoxItem.isAutoCollect(itemStack2)) {
-                            NbtCompound tag = itemStack2.getTag();
+                            CompoundTag tag = itemStack2.getTag();
                             ItemStack stackInTag = ItemStack.fromNbt(tag.getCompound("item"));
                             if (stackInTag.getItem() == itemStack.getItem()) {
                                 if (StorageBoxSlot.canInsertStack(itemStack)) {

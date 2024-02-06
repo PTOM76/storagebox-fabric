@@ -1,8 +1,8 @@
 package ml.pkom.storagebox;
 
-import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.BasicInventory;
 
-public class StorageBoxInventory extends SimpleInventory {
+public class StorageBoxInventory extends BasicInventory {
 
     public StorageBoxInventory() {
         super(1);

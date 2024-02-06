@@ -6,7 +6,7 @@ import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class ItemRendererHooks {
 
@@ -21,7 +21,7 @@ public class ItemRendererHooks {
         if (stack.getItem() instanceof StorageBoxItem) {
             ClientWorld world = MinecraftClient.getInstance().world;
             if (world != null && stack.hasTag()) {
-                NbtCompound tag = stack.getTag();
+                CompoundTag tag = stack.getTag();
                 if (!tag.contains("item")) return false;
                 ItemStack renderStack = ItemStack.fromNbt(tag.getCompound("item")).copy();
                 if (!renderStack.isEmpty()) {

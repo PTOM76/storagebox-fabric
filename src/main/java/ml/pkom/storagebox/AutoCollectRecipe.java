@@ -16,8 +16,8 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     public boolean matches(CraftingInventory inventory, World world) {
         int count = 0;
 
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0; i < inventory.getInvSize(); ++i) {
+            ItemStack stack = inventory.getInvStack(i);
             if (stack.isEmpty()) continue;
             ++count;
             if (!(stack.getItem() instanceof StorageBoxItem)) return false;
@@ -27,8 +27,8 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
 
     @Override
     public ItemStack craft(CraftingInventory inventory) {
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0; i < inventory.getInvSize(); ++i) {
+            ItemStack stack = inventory.getInvStack(i);
             if (stack.isEmpty()) continue;
             if (!(stack.getItem() instanceof StorageBoxItem)) continue;
 

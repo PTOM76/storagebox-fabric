@@ -7,7 +7,7 @@ public class StorageBoxServer {
 
     public static void init() {
         ServerPlayNetworking.registerGlobalReceiver(StorageBoxMod.id("key"), (server, player, handler, buf, responseSender) -> {
-            String str = buf.readNbt().getString("type");
+            String str = buf.readCompoundTag().getString("type");
             if (str.equals("put_out"))
                 server.execute(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {

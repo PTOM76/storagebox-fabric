@@ -1,20 +1,17 @@
 package ml.pkom.storagebox;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
+import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
+import net.minecraft.container.Container;
+import net.minecraft.container.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
 
-public class StorageBoxScreenHandler extends ScreenHandler {
-
-    public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
+public class StorageBoxScreenHandler extends Container {
 
     public static void init() {
-        SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(StorageBoxMod.id("storagebox"), StorageBoxScreenHandler::new);
+        ContainerProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("storagebox"), ((syncId1, identifier, player, buf) -> new StorageBoxScreenHandler(syncId1, player.inventory, player)));
     }
 
     private final Inventory inventory;
@@ -24,7 +21,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     }
 
     public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
-        super(SCREEN_HANDLER_TYPE, syncId);
+        super(null, syncId);
         inventory = new StorageBoxInventory();
         int m, l;
 
@@ -41,7 +38,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return inventory.canPlayerUse(player);
+        return inventory.canPlayerUseInv(player);
     }
 
     @Override
@@ -51,11 +48,11 @@ public class StorageBoxScreenHandler extends ScreenHandler {
         if (slot != null && slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+            if (invSlot < this.inventory.getInvSize()) {
+                if (!this.insertItem(originalStack, this.inventory.getInvSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            } else if (!this.insertItem(originalStack, 0, this.inventory.getInvSize(), false)) {
                 return ItemStack.EMPTY;
             }
 

@@ -3,7 +3,7 @@ package ml.pkom.storagebox;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.screen.slot.Slot;
 
 public class StorageBoxSlot extends Slot {
@@ -34,18 +34,18 @@ public class StorageBoxSlot extends Slot {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack handItem = player.getMainHandStack();
-            NbtCompound tag = handItem.getTag();
-            if (tag == null) tag = new NbtCompound();
+            CompoundTag tag = handItem.getTag();
+            if (tag == null) tag = new CompoundTag();
             tag.remove("countInBox");
             tag.remove("item");
             handItem.setTag(tag);
             return;
         }
         ItemStack handItem = player.getMainHandStack();
-        NbtCompound tag = handItem.getTag();
-        if (tag == null) tag = new NbtCompound();
+        CompoundTag tag = handItem.getTag();
+        if (tag == null) tag = new CompoundTag();
         tag.putInt("countInBox", itemStack.getCount());
-        tag.put("item", itemStack.writeNbt(new NbtCompound()));
+        tag.put("item", itemStack.writeNbt(new CompoundTag()));
         handItem.setTag(tag);
     }
 }

@@ -2,47 +2,46 @@ package ml.pkom.storagebox;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.gui.screen.ingame.ContainerScreen;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
-public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
+public class StorageBoxScreen extends ContainerScreen<StorageBoxScreenHandler> {
 
     public static Identifier GUI = StorageBoxMod.id("textures/item/itemselect.png");
 
     public StorageBoxScreen(StorageBoxScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
-        this.backgroundWidth = 176;
-        this.backgroundHeight = 166;
+        this.containerWidth = 176;
+        this.containerHeight = 166;
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        int x = (this.width - this.backgroundWidth) / 2;
-        int y = (this.height - this.backgroundHeight) / 2;
+    protected void drawBackground(float delta, int mouseX, int mouseY) {
+        int x = (this.width - this.containerWidth) / 2;
+        int y = (this.height - this.containerHeight) / 2;
 
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         MinecraftClient.getInstance().getTextureManager().bindTexture(GUI);
 
-        drawTexture(matrices, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight);
+        this.blit(x, y, 0, 0, this.containerWidth, this.containerHeight);
     }
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        super.drawForeground(matrices, mouseX, mouseY);
-        x = (this.width - this.backgroundWidth) / 2;
-        y = (this.height - this.backgroundHeight) / 2;
-        this.textRenderer.draw(matrices, new TranslatableText("item.storagebox.storage"), 8, 20, 4210752);
-        this.textRenderer.draw(matrices, new TranslatableText("item.storagebox.storagebox"), 8, 6, 4210752);
+    protected void drawForeground(int mouseX, int mouseY) {
+        super.drawForeground(mouseX, mouseY);
+        x = (this.width - this.containerWidth) / 2;
+        y = (this.height - this.containerHeight) / 2;
+        this.font.draw(new TranslatableText("item.storagebox.storage").asFormattedString(), 8, 20, 4210752);
+        this.font.draw(new TranslatableText("item.storagebox.storagebox").asFormattedString(), 8, 6, 4210752);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        this.renderBackground(matrices);
-        super.render(matrices, mouseX, mouseY, delta);
-        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
+    public void render(int mouseX, int mouseY, float delta) {
+        this.renderBackground();
+        super.render(mouseX, mouseY, delta);
+        this.drawMouseoverTooltip(mouseX, mouseY);
     }
 }

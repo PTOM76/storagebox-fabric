@@ -113,7 +113,7 @@ public class ItemPickupMixin {
                 for (ItemStack inStack : player.getInventory().main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
-                        for (ItemStack enderChestStack : player.getEnderChestInventory().getHeldStacks()) {
+                        for (ItemStack enderChestStack : player.getEnderChestInventory().stacks) {
                             if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;

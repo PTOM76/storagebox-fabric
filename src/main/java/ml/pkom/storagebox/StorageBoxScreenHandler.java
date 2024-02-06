@@ -1,10 +1,12 @@
 package ml.pkom.storagebox;
 
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
@@ -14,7 +16,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
 
     public static void init() {
-        SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(StorageBoxMod.id("storagebox"), StorageBoxScreenHandler::new);
+        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new, FeatureSet.empty()));
     }
 
     private final Inventory inventory;
@@ -23,7 +25,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
         this(syncId, playerInventory);
     }
 
-    protected StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(SCREEN_HANDLER_TYPE, syncId);
         inventory = new StorageBoxInventory();
         int m, l;

@@ -16,7 +16,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
 
     public static void init() {
-        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new, FeatureSet.empty()));
+        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new));
     }
 
     private final Inventory inventory;

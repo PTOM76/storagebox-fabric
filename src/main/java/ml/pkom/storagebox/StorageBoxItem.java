@@ -113,7 +113,7 @@ public class StorageBoxItem extends Item {
 
             data = nbt.getInt(key);
         }
-        if (key.equals(KEY_AUTO)) {
+        if (key.equals(KEY_AUTO) && (nbt == null || !nbt.contains(key))) {
             // 0 = true, 1 = false
             Boolean defaultAutoCollect = ModConfig.getBoolean("DefaultAutoCollect");
             if (defaultAutoCollect == null) return 0;
@@ -126,7 +126,7 @@ public class StorageBoxItem extends Item {
     public static boolean isAutoCollect(ItemStack storageBoxStack) {
         if (storageBoxStack.hasNbt()) {
             NbtCompound nbt = storageBoxStack.getNbt();
-            if (nbt.contains("autoCollect")) {
+            if (!nbt.contains(KEY_AUTO) && nbt.contains("autoCollect")) {
                 return nbt.getBoolean("autoCollect");
             }
         }
@@ -182,6 +182,7 @@ public class StorageBoxItem extends Item {
     public StorageBoxItem(Settings settings) {
         super(settings.group(ItemGroup.MISC).maxCount(1));
     }
+
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);

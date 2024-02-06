@@ -102,7 +102,7 @@ public class ItemPickupMixin {
         Boolean supportEnderChest = ModConfig.getBoolean("SupportEnderChest");
         if (supportEnderChest == null) supportEnderChest = true;
 
-        if (!itemEntity.getWorld().isClient) {
+        if (!itemEntity.world.isClient) {
             ItemStack itemStack = itemEntity.getStack();
             Item item = itemStack.getItem();
             int count = itemStack.getCount();

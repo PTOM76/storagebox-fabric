@@ -2,6 +2,7 @@ package ml.pkom.storagebox;
 
 import ml.pkom.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
@@ -14,31 +15,26 @@ public class ItemRendererHooks {
 
     private static final ThreadLocal<ItemStack> OVERRIDING_FOR = new ThreadLocal<>();
 
-    public static boolean onRenderItemModel(ItemRenderer renderer, MatrixStack matrices, ItemStack stack, int x, int y,
-                                            BakedModel model) {
-        if (OVERRIDING_FOR.get() == stack) {
-            return false;
-        }
+    public static boolean onRenderItemModel(ItemRenderer renderer, MatrixStack matrices, ItemStack stack, int x, int y, BakedModel model) {
+        if (OVERRIDING_FOR.get() == stack) return false;
+        if (!(stack.getItem() instanceof StorageBoxItem)) return false;
+        ClientWorld world = MinecraftClient.getInstance().world;
 
-        if (stack.getItem() instanceof StorageBoxItem) {
-            ClientWorld world = MinecraftClient.getInstance().world;
-            if (world != null) {
-                if (!hasStackInStorageBox(stack)) return false;
-                ItemStack renderStack = getStackInStorageBox(stack).copy();
-                if (!renderStack.isEmpty()) {
-                    renderStack.setCount(1);
-                    BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
-                            .getModel(renderStack);
-                    OVERRIDING_FOR.set(stack);
-                    try {
-                        ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(matrices, stack, x, y, realModel);
-                    } finally {
-                        OVERRIDING_FOR.remove();
-                    }
-                    return true;
-                }
-            }
+        if (world == null) return false;
+        if (!hasStackInStorageBox(stack)) return false;
+        ItemStack renderStack = getStackInStorageBox(stack).copy();
+
+        if (renderStack.isEmpty()) return false;
+
+        renderStack.setCount(1);
+        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
+                .getModel(renderStack);
+        OVERRIDING_FOR.set(stack);
+        try {
+            ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(matrices, stack, x, y, realModel);
+        } finally {
+            OVERRIDING_FOR.remove();
         }
-        return false;
+        return true;
     }
 }

@@ -33,12 +33,9 @@ public class StorageBoxClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (isKeyPressed()) {
                 PlayerEntity player = client.player;
-                if (player == null) {
-                    return;
-                }
-                if (player.getMainHandStack() == null) {
-                    return;
-                }
+                if (player == null) return;
+                if (player.getMainHandStack() == null) return;
+
                 if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt()) {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
@@ -81,7 +78,9 @@ public class StorageBoxClient implements ClientModInitializer {
         });
         // ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> new ModelProvider());
     }
+
     private int coolDown = 0;
+
     private boolean isKeyPressed() {
         final Window mw = MinecraftClient.getInstance().getWindow();
         if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {

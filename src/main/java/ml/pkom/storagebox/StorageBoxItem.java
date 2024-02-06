@@ -557,7 +557,7 @@ public class StorageBoxItem extends Item {
             tooltip.add(new LiteralText("§7Name: " + stack.getItem().getName().getString()));
             tooltip.add(new LiteralText("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
             tooltip.add(new LiteralText("§7Items: " + count));
-            tooltip.add(new LiteralText("§7AutoCollect: " + (isAutoCollect(stack) ? "ON" : "OFF")));
+            tooltip.add(new LiteralText("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
             tooltip.add(new LiteralText("§7[Information]"));
             if (item != null)
                 item.appendTooltip(stack, world, tooltip, context);

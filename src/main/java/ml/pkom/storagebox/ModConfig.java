@@ -15,9 +15,9 @@ public class ModConfig {
 
     public static void init() {
         setDefault();
-        if (!load()) {
+        if (!load())
             save();
-        }
+
     }
 
     public static boolean save() {
@@ -46,8 +46,6 @@ public class ModConfig {
 
         return false;
     }
-
-
 
     public static void setDefault() {
         setBoolean("DefaultAutoCollect", true);
@@ -89,20 +87,19 @@ public class ModConfig {
 
     public static Integer getInt(String key) {
         Object value = get(key);
-        if (value instanceof Integer) {
+        if (value instanceof Integer)
             return (Integer) value;
-        }
-        if (value instanceof String) {
+        if (value instanceof String)
             return Integer.getInteger((String) value);
-        }
+
         return null;
     }
 
     public static String getString(String key) {
         Object value = get(key);
-        if (value instanceof String) {
+        if (value instanceof String)
             return (String) value;
-        }
+
         return value.toString();
     }
 

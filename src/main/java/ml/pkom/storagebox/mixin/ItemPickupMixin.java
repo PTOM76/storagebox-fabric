@@ -74,7 +74,7 @@ public class ItemPickupMixin {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
                 NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
+                DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.field_31356, ItemStack.EMPTY);
                 Inventories.readNbt(tileNbt, items);
 
                 int i;

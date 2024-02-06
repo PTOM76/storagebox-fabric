@@ -16,29 +16,25 @@ public class ItemRendererHooks {
     private static final ThreadLocal<ItemStack> OVERRIDING_FOR = new ThreadLocal<>();
 
     public static boolean onRenderItemModel(ItemRenderer renderer, BakedModel model, ItemStack stack, int light, int overlay, MatrixStack matrices, VertexConsumer vertices) {
-        if (OVERRIDING_FOR.get() == stack) {
-            return false;
-        }
+        if (OVERRIDING_FOR.get() == stack) return false;
+        if (!(stack.getItem() instanceof StorageBoxItem)) return false;
+        ClientWorld world = MinecraftClient.getInstance().world;
 
-        if (stack.getItem() instanceof StorageBoxItem) {
-            ClientWorld world = MinecraftClient.getInstance().world;
-            if (world != null) {
-                if (!hasStackInStorageBox(stack)) return false;
-                ItemStack renderStack = getStackInStorageBox(stack).copy();
-                if (!renderStack.isEmpty()) {
-                    renderStack.setCount(1);
-                    BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
-                            .getModel(renderStack);
-                    OVERRIDING_FOR.set(stack);
-                    try {
-                        ((ItemRendererAccessor) renderer).invokeRenderBakedItemModel(realModel, stack, light, overlay, matrices, vertices);
-                    } finally {
-                        OVERRIDING_FOR.remove();
-                    }
-                    return true;
-                }
-            }
+        if (world == null) return false;
+        if (!hasStackInStorageBox(stack)) return false;
+        ItemStack renderStack = getStackInStorageBox(stack).copy();
+
+        if (renderStack.isEmpty()) return false;
+
+        renderStack.setCount(1);
+        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
+                .getModel(renderStack);
+        OVERRIDING_FOR.set(stack);
+        try {
+            ((ItemRendererAccessor) renderer).invokeRenderBakedItemModel(realModel, stack, light, overlay, matrices, vertices);
+        } finally {
+            OVERRIDING_FOR.remove();
         }
-        return false;
+        return true;
     }
 }

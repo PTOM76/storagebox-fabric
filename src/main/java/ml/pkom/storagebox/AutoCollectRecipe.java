@@ -1,21 +1,21 @@
 package ml.pkom.storagebox;
 
-import net.minecraft.inventory.RecipeInputInventory;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class AutoCollectRecipe extends SpecialCraftingRecipe {
-    public AutoCollectRecipe(CraftingRecipeCategory category) {
-        super(category);
+    public AutoCollectRecipe(Identifier id, CraftingRecipeCategory category) {
+        super(id, category);
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingInventory inventory, World world) {
         int count = 0;
 
         for (int i = 0; i < inventory.size(); ++i) {
@@ -28,7 +28,7 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, DynamicRegistryManager registryManager) {
+    public ItemStack craft(CraftingInventory inventory) {
         for (int i = 0; i < inventory.size(); ++i) {
             ItemStack stack = inventory.getStack(i);
             if (stack.isEmpty()) continue;

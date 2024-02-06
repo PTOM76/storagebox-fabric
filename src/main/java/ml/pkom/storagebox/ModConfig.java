@@ -11,6 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ModConfig {
+    public static File dir = FabricLoader.getInstance().getConfigDir().toFile();
+    public static File file = new File(dir, "storagebox.json");
+
+
     private static Map<String, Object> configMap = new LinkedHashMap<>();
 
     public static void init() {
@@ -21,9 +25,8 @@ public class ModConfig {
     }
 
     public static boolean save() {
-        File dir = FabricLoader.getInstance().getConfigDir().toFile();
-        if (!dir.exists()) dir.mkdirs();
-        File file = new File(dir, "storagebox.json");
+        if (!dir.exists())
+            dir.mkdirs();
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(configMap);
@@ -31,9 +34,8 @@ public class ModConfig {
     }
 
     public static boolean load() {
-        File dir = FabricLoader.getInstance().getConfigDir().toFile();
-        if (!dir.exists()) dir.mkdirs();
-        File file = new File(dir, "storagebox.json");
+        if (!dir.exists())
+            dir.mkdirs();
 
         if (file.exists()) {
             String json = fileReadContents(file);
@@ -76,12 +78,11 @@ public class ModConfig {
             Integer i = (Integer) value;
             return i != 0;
         }
-        if (value instanceof Boolean) {
+        if (value instanceof Boolean)
             return (Boolean) value;
-        }
-        if (value instanceof String) {
+        if (value instanceof String)
             return Boolean.getBoolean((String) value);
-        }
+
         return null;
     }
 
@@ -137,13 +138,13 @@ public class ModConfig {
     public static String fileReadContents(File file) {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
-            String line = "";
-            String contents = "";
+            String line;
+            StringBuilder contents = new StringBuilder();
             while ((line = reader.readLine()) != null) {
-                contents += line + "\n";
+                contents.append(line).append("\n");
             }
             reader.close();
-            return contents;
+            return contents.toString();
         } catch (IOException e) {
             e.printStackTrace();
             return null;

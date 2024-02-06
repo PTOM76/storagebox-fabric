@@ -14,7 +14,6 @@ public class ModConfig {
     public static File dir = FabricLoader.getInstance().getConfigDir().toFile();
     public static File file = new File(dir, "storagebox.json");
 
-
     private static Map<String, Object> configMap = new LinkedHashMap<>();
 
     public static void init() {
@@ -67,10 +66,10 @@ public class ModConfig {
     public static void setInt(String key, int value) {
         configMap.put(key, value);
     }
+
     public static void setString(String key, String value) {
         configMap.put(key, value);
     }
-
 
     public static Boolean getBoolean(String key) {
         Object value = get(key);

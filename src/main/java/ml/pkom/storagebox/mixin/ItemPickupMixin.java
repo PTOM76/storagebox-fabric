@@ -4,6 +4,7 @@ import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
 import ml.pkom.storagebox.StorageBoxSlot;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -17,7 +18,6 @@ import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,13 +31,12 @@ public class ItemPickupMixin {
     private static boolean process(ItemStack stack, ItemStack pickupStack) {
         // ストレージボックス
         if (stack.getItem() instanceof StorageBoxItem) {
-            ItemStack storageBoxStack = stack;
-            if (!StorageBoxItem.isAutoCollect(storageBoxStack)) return false;
-            ItemStack stackInNbt = getStackInStorageBox(storageBoxStack);
+            if (!StorageBoxItem.isAutoCollect(stack)) return false;
+            ItemStack stackInNbt = getStackInStorageBox(stack);
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxSlot.canInsertStack(pickupStack)) return false;
-                setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) + pickupStack.getCount());
+                setItemStackSize(stack, getItemDataAsInt(stack, KEY_SIZE) + pickupStack.getCount());
                 return true;
             }
         }
@@ -48,11 +47,19 @@ public class ItemPickupMixin {
         if (supportSimpleBackpack && Registries.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
-                nbt = nbt.getCompound("backpack");
+                NbtCompound backpackNbt = nbt.getCompound("backpack");
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(54, ItemStack.EMPTY);
-                Inventories.readNbt(nbt, items);
-                for (ItemStack inStack : items) {
+                Inventories.readNbt(backpackNbt, items);
+
+                int i;
+                for (i = 0; i < items.size(); i++) {
+                    ItemStack inStack = items.get(i);
                     if (process(inStack, pickupStack)) {
+                        // バックパック内のストレージボックスのNBTを更新
+                        items.set(i, inStack);
+                        Inventories.writeNbt(backpackNbt, items);
+                        nbt.put("backpack", backpackNbt);
+                        stack.setNbt(nbt);
                         return true;
                     }
                 }
@@ -65,11 +72,19 @@ public class ItemPickupMixin {
         if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
-                nbt = nbt.getCompound("BlockEntityTag");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
-                Inventories.readNbt(nbt, items);
-                for (ItemStack inStack : items) {
+                NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
+                DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
+                Inventories.readNbt(tileNbt, items);
+
+                int i;
+                for (i = 0; i < items.size(); i++) {
+                    ItemStack inStack = items.get(i);
                     if (process(inStack, pickupStack)) {
+                        // シュルカーボックス内のストレージボックスのNBTを更新
+                        items.set(i, inStack);
+                        Inventories.writeNbt(tileNbt, items);
+                        nbt.put("BlockEntityTag", tileNbt);
+                        stack.setNbt(nbt);
                         return true;
                     }
                 }

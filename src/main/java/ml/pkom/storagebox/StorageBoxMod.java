@@ -1,6 +1,7 @@
 package ml.pkom.storagebox;
 
 import net.fabricmc.api.ModInitializer;
+import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.Level;
@@ -18,6 +19,7 @@ public class StorageBoxMod implements ModInitializer
         Registry.register(Registry.ITEM, id("storagebox"), StorageBoxItem.instance);
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
+        StorageBoxRecipeSerializer.init();
 
         ModConfig.init();
     }

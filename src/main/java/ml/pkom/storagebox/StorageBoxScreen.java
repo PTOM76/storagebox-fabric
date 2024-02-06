@@ -1,7 +1,6 @@
 package ml.pkom.storagebox;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import ml.pkom.mcpitanlib.api.text.TextUtil;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -38,8 +37,8 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
         super.drawForeground(matrices, mouseX, mouseY);
         x = (this.width - this.backgroundWidth) / 2;
         y = (this.height - this.backgroundHeight) / 2;
-        this.textRenderer.draw(matrices, TextUtil.translatable("item.storagebox.storage"), 8, 20, 4210752);
-        this.textRenderer.draw(matrices, TextUtil.translatable("item.storagebox.storagebox"), 8, 6, 4210752);
+        this.textRenderer.draw(matrices, Text.translatable("item.storagebox.storage"), 8, 20, 4210752);
+        this.textRenderer.draw(matrices, Text.translatable("item.storagebox.storagebox"), 8, 6, 4210752);
     }
 
     @Override

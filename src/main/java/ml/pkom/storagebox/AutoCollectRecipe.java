@@ -2,16 +2,16 @@ package ml.pkom.storagebox;
 
 import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Recipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 public class AutoCollectRecipe extends SpecialCraftingRecipe {
-    public AutoCollectRecipe(CraftingRecipeCategory category) {
-        super(category);
+    public AutoCollectRecipe(Identifier id, CraftingRecipeCategory category) {
+        super(id, category);
     }
 
     @Override

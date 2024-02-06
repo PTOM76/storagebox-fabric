@@ -7,13 +7,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.registry.Registry;
 
 public class StorageBoxScreenHandler extends ScreenHandler {
 
     public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
 
     public static void init() {
-        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new));
+        SCREEN_HANDLER_TYPE = Registry.register(Registry.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new));
     }
     //public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE = ScreenHandlerRegistry.registerSimple(StorageBoxMod.id("storagebox"), StorageBoxScreenHandler::new);
 

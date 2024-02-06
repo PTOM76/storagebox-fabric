@@ -4,6 +4,7 @@ import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
 import ml.pkom.storagebox.StorageBoxSlot;
 import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -31,13 +32,12 @@ public class ItemPickupMixin {
     private static boolean process(ItemStack stack, ItemStack pickupStack) {
         // ストレージボックス
         if (stack.getItem() instanceof StorageBoxItem) {
-            ItemStack storageBoxStack = stack;
-            if (!StorageBoxItem.isAutoCollect(storageBoxStack)) return false;
-            ItemStack stackInNbt = getStackInStorageBox(storageBoxStack);
+            if (!StorageBoxItem.isAutoCollect(stack)) return false;
+            ItemStack stackInNbt = getStackInStorageBox(stack);
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxSlot.canInsertStack(pickupStack)) return false;
-                setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) + pickupStack.getCount());
+                setItemStackSize(stack, getItemDataAsInt(stack, KEY_SIZE) + pickupStack.getCount());
                 return true;
             }
         }
@@ -51,8 +51,15 @@ public class ItemPickupMixin {
                 nbt = nbt.getCompound("backpack");
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(54, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, items);
-                for (ItemStack inStack : items) {
+
+                int i;
+                for (i = 0; i < items.size(); i++) {
+                    ItemStack inStack = items.get(i);
                     if (process(inStack, pickupStack)) {
+                        // バックパック内のストレージボックスのNBTを更新
+                        items.set(i, inStack);
+                        Inventories.writeNbt(nbt, items);
+                        stack.setNbt(nbt);
                         return true;
                     }
                 }
@@ -66,10 +73,17 @@ public class ItemPickupMixin {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
                 nbt = nbt.getCompound("BlockEntityTag");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
+                DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
                 Inventories.readNbt(nbt, items);
-                for (ItemStack inStack : items) {
+
+                int i;
+                for (i = 0; i < items.size(); i++) {
+                    ItemStack inStack = items.get(i);
                     if (process(inStack, pickupStack)) {
+                        // シュルカーボックス内のストレージボックスのNBTを更新
+                        items.set(i, inStack);
+                        Inventories.writeNbt(nbt, items);
+                        stack.setNbt(nbt);
                         return true;
                     }
                 }

@@ -21,7 +21,7 @@ public class StorageBoxMod implements ModInitializer
 
         ModConfig.init();
     }
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     public static void log(Level level, String message){
         LOGGER.log(level, "[" + MOD_NAME + "] " + message);

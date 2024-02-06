@@ -47,9 +47,9 @@ public class ItemPickupMixin {
         if (supportSimpleBackpack && Registry.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
-                nbt = nbt.getCompound("backpack");
+                NbtCompound backpackNbt = nbt.getCompound("backpack");
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(54, ItemStack.EMPTY);
-                Inventories.readNbt(nbt, items);
+                Inventories.readNbt(backpackNbt, items);
 
                 int i;
                 for (i = 0; i < items.size(); i++) {
@@ -57,7 +57,8 @@ public class ItemPickupMixin {
                     if (process(inStack, pickupStack)) {
                         // バックパック内のストレージボックスのNBTを更新
                         items.set(i, inStack);
-                        Inventories.writeNbt(nbt, items);
+                        Inventories.writeNbt(backpackNbt, items);
+                        nbt.put("backpack", backpackNbt);
                         stack.setNbt(nbt);
                         return true;
                     }
@@ -71,9 +72,9 @@ public class ItemPickupMixin {
         if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
-                nbt = nbt.getCompound("BlockEntityTag");
+                NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
-                Inventories.readNbt(nbt, items);
+                Inventories.readNbt(tileNbt, items);
 
                 int i;
                 for (i = 0; i < items.size(); i++) {
@@ -81,7 +82,8 @@ public class ItemPickupMixin {
                     if (process(inStack, pickupStack)) {
                         // シュルカーボックス内のストレージボックスのNBTを更新
                         items.set(i, inStack);
-                        Inventories.writeNbt(nbt, items);
+                        Inventories.writeNbt(tileNbt, items);
+                        nbt.put("BlockEntityTag", tileNbt);
                         stack.setNbt(nbt);
                         return true;
                     }
@@ -99,7 +101,7 @@ public class ItemPickupMixin {
         Boolean supportEnderChest = ModConfig.getBoolean("SupportEnderChest");
         if (supportEnderChest == null) supportEnderChest = true;
 
-        if (!itemEntity.world.isClient) {
+        if (!itemEntity.getWorld().isClient) {
             ItemStack itemStack = itemEntity.getStack();
             Item item = itemStack.getItem();
             int count = itemStack.getCount();

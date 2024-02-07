@@ -47,7 +47,7 @@ public abstract class RenderStorageBoxMixin {
                 .getModel(renderStack);
         RENDER_ITEM_OVERRIDING_FOR.set(stack);
         try {
-            this.renderItem(stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, realModel);
+            this.renderItem(renderStack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, realModel);
         } finally {
             RENDER_ITEM_OVERRIDING_FOR.remove();
         }

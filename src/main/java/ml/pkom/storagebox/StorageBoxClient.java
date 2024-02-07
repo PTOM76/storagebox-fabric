@@ -6,16 +6,22 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.screen.ScreenProviderRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.color.item.ItemColorProvider;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
+
+import static ml.pkom.storagebox.StorageBoxItem.getItem;
+import static ml.pkom.storagebox.StorageBoxItem.getStackInStorageBox;
 
 public class StorageBoxClient implements ClientModInitializer {
 
@@ -30,6 +36,22 @@ public class StorageBoxClient implements ClientModInitializer {
                 "key.storagebox.category"
         ));
         ScreenProviderRegistry.INSTANCE.<StorageBoxScreenHandler>registerFactory(StorageBoxMod.id("storagebox"), ((container) -> new StorageBoxScreen(container, MinecraftClient.getInstance().player.inventory, new LiteralText(""))));
+
+        ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
+            ItemStack stack = getStackInStorageBox(storageBoxStack);
+            if (stack == null || stack.isEmpty()) return -1;
+            if (stack.getItem() instanceof ItemColorProvider) {
+                ItemColorProvider provider = (ItemColorProvider) getItem(stack);
+                return provider.getColor(stack, tintIndex);
+            }
+
+            try {
+                return ColorProviderRegistry.ITEM.get(stack.getItem()).getColor(stack, tintIndex);
+            } catch (NullPointerException e) {
+                return -1;
+            }
+
+        }), StorageBoxItem.instance);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (isKeyPressed()) {
@@ -77,7 +99,6 @@ public class StorageBoxClient implements ClientModInitializer {
             }
             coolDown--;
         });
-        // ModelLoadingRegistry.INSTANCE.registerResourceProvider(resourceManager -> new ModelProvider());
     }
 
     private int coolDown = 0;

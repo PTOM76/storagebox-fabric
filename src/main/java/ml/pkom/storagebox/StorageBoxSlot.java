@@ -19,15 +19,7 @@ public class StorageBoxSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return canInsertStack(stack);
-    }
-
-    public static boolean canInsertStack(ItemStack stack) {
-        if (stack.getItem() == StorageBoxItem.instance) return false;
-        if (stack.isEnchantable()) return false;
-        if (stack.isDamageable()) return false;
-        if (stack.hasTag()) return false;
-        return true;
+        return StorageBoxItem.canInsertStack(stack);
     }
 
     @Override
@@ -44,5 +36,10 @@ public class StorageBoxSlot extends Slot {
         ItemStack storageBoxStack = player.getMainHandStack();
         setItemStack(storageBoxStack, itemStack.copy());
         setItemStackSize(storageBoxStack, itemStack.getCount());
+    }
+
+    @Override
+    public ItemStack takeStack(int amount) {
+        return super.takeStack(amount);
     }
 }

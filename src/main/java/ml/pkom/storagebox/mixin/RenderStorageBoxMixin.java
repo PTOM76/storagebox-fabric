@@ -36,26 +36,22 @@ public abstract class RenderStorageBoxMixin {
 
     @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformation$Mode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At("HEAD"), cancellable = true)
     protected void renderItem(ItemStack stack, ModelTransformation.Mode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
-        if (RENDER_ITEM_OVERRIDING_FOR.get() == stack) {
-            return;
-        }
+        if (RENDER_ITEM_OVERRIDING_FOR.get() == stack) return;
+        if (!(stack.getItem() instanceof StorageBoxItem)) return;
+        ClientWorld world = MinecraftClient.getInstance().world;
 
-        if (stack.getItem() instanceof StorageBoxItem) {
-            ClientWorld world = MinecraftClient.getInstance().world;
-            if (world != null) {
-                if (!hasStackInStorageBox(stack)) return;
-                ItemStack renderStack = getStackInStorageBox(stack).copy();
-                renderStack.setCount(1);
-                BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
-                        .getModel(renderStack);
-                RENDER_ITEM_OVERRIDING_FOR.set(stack);
-                try {
-                    this.renderItem(stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, realModel);
-                } finally {
-                    RENDER_ITEM_OVERRIDING_FOR.remove();
-                }
-                ci.cancel();
-            }
+        if (world == null) return;
+        if (!hasStackInStorageBox(stack)) return;
+        ItemStack renderStack = getStackInStorageBox(stack).copy();
+        renderStack.setCount(1);
+        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
+                .getModel(renderStack);
+        RENDER_ITEM_OVERRIDING_FOR.set(stack);
+        try {
+            this.renderItem(stack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, realModel);
+        } finally {
+            RENDER_ITEM_OVERRIDING_FOR.remove();
         }
+        ci.cancel();
     }
 }

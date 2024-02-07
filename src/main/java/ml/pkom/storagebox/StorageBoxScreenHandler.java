@@ -63,7 +63,7 @@ public class StorageBoxScreenHandler extends Container {
             }
         }
 
-        return StorageBoxSlot.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
+        return StorageBoxItem.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
     }
 
 }

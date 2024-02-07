@@ -66,7 +66,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
             }
         }
 
-        return StorageBoxSlot.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
+        return StorageBoxItem.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
     }
 
 }

@@ -40,6 +40,16 @@ public class StorageBoxSlot extends Slot {
 
     @Override
     public ItemStack takeStack(int amount) {
+        ItemStack storageBoxStack = player.getMainHandStack();
+        if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
+        if (amount == getStack().getCount()) {
+            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
+            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
+        } else {
+            setItemDataAsInt(storageBoxStack, KEY_SIZE, getItemDataAsInt(storageBoxStack, KEY_SIZE) - amount);
+        }
         return super.takeStack(amount);
     }
 }

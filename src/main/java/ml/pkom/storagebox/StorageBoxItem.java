@@ -399,9 +399,11 @@ public class StorageBoxItem extends Item {
             user.setStackInHand(hand, storageBoxStack);
             storageBoxStack.setCount(1);
 
+            /*
             if (result == ActionResult.SUCCESS || result == ActionResult.CONSUME) {
                 stack.decrement(1);
             }
+            */
 
             if (countIsOverMax) {
                 countInBox += stack.getCount();
@@ -600,8 +602,6 @@ public class StorageBoxItem extends Item {
         return sb;
     }
 
-
-
     public static boolean canGive(DefaultedList<ItemStack> inv) {
         for ( ItemStack stack : inv ) {
             if (stack.isEmpty()) return true;
@@ -609,8 +609,6 @@ public class StorageBoxItem extends Item {
 
         return false;
     }
-
-
 
     public static boolean canInsertStack(ItemStack stack) {
         if (stack.getItem() == StorageBoxItem.instance) return false;

@@ -2,7 +2,6 @@ package ml.pkom.storagebox.mixin;
 
 import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
-import ml.pkom.storagebox.StorageBoxSlot;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,7 +34,7 @@ public class ItemPickupMixin {
             ItemStack stackInNbt = getStackInStorageBox(stack);
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
-                if (!StorageBoxSlot.canInsertStack(pickupStack)) return false;
+                if (!StorageBoxItem.canInsertStack(pickupStack, stack)) return false;
                 setItemStackSize(stack, getItemDataAsInt(stack, KEY_SIZE) + pickupStack.getCount());
                 return true;
             }

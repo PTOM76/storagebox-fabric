@@ -20,6 +20,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -386,7 +387,8 @@ public class StorageBoxItem extends Item {
 
             ActionResult result;
 
-            result = stack.useOnBlock(context);
+            BlockHitResult hit = new BlockHitResult(context.getHitPos(), context.getSide(), context.getBlockPos(), context.hitsInsideBlock());
+            result = stack.useOnBlock(new ItemUsageContext(context.getWorld(), context.getPlayer(), context.getHand(), stack, hit));
 
             if (result != ActionResult.SUCCESS) {
                 canUse = false;
@@ -424,6 +426,7 @@ public class StorageBoxItem extends Item {
     public void keyboardEvent(int type, PlayerEntity player, ItemStack storageBoxStack) {
         if (type == 0) {
             if (player.currentScreenHandler != null && !(player.currentScreenHandler instanceof PlayerScreenHandler) && !(player.currentScreenHandler.slots.size() <= 0)) {
+                // コンテナー
                 if (hasStackInStorageBox(storageBoxStack)) {
                     ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                     int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
@@ -508,7 +511,7 @@ public class StorageBoxItem extends Item {
                         if (slot.inventory == player.getInventory()) continue;
                         ItemStack stack = slot.getStack();
                         if (stack.getItem() == itemInBox.getItem()) {
-                            if (!StorageBoxSlot.canInsertStack(stack)) continue;
+                            if (!canInsertStack(stack, storageBoxStack)) continue;
                             count += stack.getCount();
                             player.getInventory().removeOne(stack);
                             stack.setCount(0);
@@ -525,7 +528,7 @@ public class StorageBoxItem extends Item {
                 int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
                 for (ItemStack stack : player.getInventory().main) {
                     if (stack.getItem() == itemInBox.getItem()) {
-                        if (!StorageBoxSlot.canInsertStack(stack)) continue;
+                        if (!canInsertStack(stack, storageBoxStack)) continue;
                         count += stack.getCount();
                         player.getInventory().removeOne(stack);
                         stack.setCount(0);
@@ -604,5 +607,27 @@ public class StorageBoxItem extends Item {
         }
 
         return false;
+    }
+
+
+
+    public static boolean canInsertStack(ItemStack stack) {
+        if (stack.getItem() == StorageBoxItem.instance) return false;
+        if (stack.isEnchantable()) return false;
+        if (stack.isDamageable()) return false;
+        return true;
+    }
+
+    public static boolean canInsertStack(ItemStack stack, ItemStack storageBoxStack) {
+        if (stack.getItem() == StorageBoxItem.instance) return false;
+        if (stack.isEnchantable()) return false;
+        if (stack.isDamageable()) return false;
+        if (stack.hasNbt()) {
+            ItemStack stackInBox = getStackInStorageBox(storageBoxStack);
+            if (stackInBox == null || stackInBox.isEmpty()) return false;
+            if (!stackInBox.hasNbt()) return false;
+            if (!stackInBox.getNbt().equals(stack.getNbt())) return false;
+        }
+        return true;
     }
 }

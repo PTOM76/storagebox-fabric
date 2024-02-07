@@ -29,7 +29,7 @@ public class ItemRendererHooks {
                 .getModel(renderStack);
         OVERRIDING_FOR.set(stack);
         try {
-            ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(stack, x, y, realModel);
+            ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(renderStack, x, y, realModel);
         } finally {
             OVERRIDING_FOR.remove();
         }

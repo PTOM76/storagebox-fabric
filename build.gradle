@@ -32,6 +32,15 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 }
 
+processResources {
+	inputs.property "version", project.version
+	filteringCharset "UTF-8"
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
 def targetJavaVersion = 8
 tasks.withType(JavaCompile).configureEach {
 	// ensure that the encoding is set to UTF-8, no matter what the system default is

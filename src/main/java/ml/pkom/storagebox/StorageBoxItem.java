@@ -399,9 +399,11 @@ public class StorageBoxItem extends Item {
             user.setStackInHand(hand, storageBoxStack);
             storageBoxStack.setCount(1);
 
+            /*
             if (result == ActionResult.SUCCESS || result == ActionResult.CONSUME) {
                 stack.decrement(1);
             }
+            */
 
             if (countIsOverMax) {
                 countInBox += stack.getCount();

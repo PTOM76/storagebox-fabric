@@ -623,11 +623,11 @@ public class StorageBoxItem extends Item {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (stack.hasNbt()) {
+        if (stack.hasTag()) {
             ItemStack stackInBox = getStackInStorageBox(storageBoxStack);
             if (stackInBox == null || stackInBox.isEmpty()) return false;
-            if (!stackInBox.hasNbt()) return false;
-            if (!stackInBox.getNbt().equals(stack.getNbt())) return false;
+            if (!stackInBox.hasTag()) return false;
+            if (!stackInBox.getTag().equals(stack.getTag())) return false;
         }
         return true;
     }

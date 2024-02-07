@@ -31,7 +31,7 @@ public class ItemRendererHooks {
                 .getModel(renderStack);
         OVERRIDING_FOR.set(stack);
         try {
-            ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(matrices, stack, x, y, realModel);
+            ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(matrices, renderStack, x, y, realModel);
         } finally {
             OVERRIDING_FOR.remove();
         }

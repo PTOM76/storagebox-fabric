@@ -4,7 +4,6 @@ import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.container.PlayerContainer;
-import net.minecraft.container.SimpleNamedContainerFactory;
 import net.minecraft.container.Slot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -393,9 +393,10 @@ public class StorageBoxItem extends Item {
             user.setStackInHand(hand, storageBoxStack);
             storageBoxStack.setCount(1);
 
-            if (result == ActionResult.SUCCESS || result == ActionResult.CONSUME) {
-                stack.decrement(1);
+            /*if (result == ActionResult.SUCCESS || result == ActionResult.CONSUME) {
+                //stack.decrement(1);
             }
+            */
 
             if (countIsOverMax) {
                 countInBox += stack.getCount();

@@ -47,6 +47,6 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return null;
+        return StorageBoxRecipeSerializer.CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES;
     }
 }

@@ -1,7 +1,6 @@
 package ml.pkom.storagebox;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
@@ -11,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 public class StorageBoxMod implements ModInitializer
 {
-    // Origin: https://www.curseforge.com/minecraft/mc-mods/storagebox-mod
+    // Forge: https://www.curseforge.com/minecraft/mc-mods/storagebox-mod
     public static String MOD_NAME = "StorageBox";
     public static String MOD_ID = "storagebox";
 

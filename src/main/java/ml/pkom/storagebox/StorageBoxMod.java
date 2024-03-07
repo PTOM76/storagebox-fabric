@@ -16,6 +16,8 @@ public class StorageBoxMod implements ModInitializer
 
     @Override
     public void onInitialize() {
+        DataComponentTypes.init();
+
         Registry.register(Registries.ITEM, id("storagebox"), StorageBoxItem.instance);
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();

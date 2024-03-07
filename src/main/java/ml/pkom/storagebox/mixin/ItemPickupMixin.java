@@ -1,21 +1,14 @@
 package ml.pkom.storagebox.mixin;
 
+import ml.pkom.storagebox.DataComponentTypes;
 import ml.pkom.storagebox.ModConfig;
 import ml.pkom.storagebox.StorageBoxItem;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.stat.Stats;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.collection.DefaultedList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -35,7 +28,7 @@ public class ItemPickupMixin {
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxItem.canInsertStack(pickupStack, stack)) return false;
-                setItemStackSize(stack, getItemDataAsInt(stack, KEY_SIZE) + pickupStack.getCount());
+                setItemStackSize(stack, getComponentAsInt(stack, DataComponentTypes.ITEM_COUNT) + pickupStack.getCount());
                 return true;
             }
         }
@@ -43,6 +36,7 @@ public class ItemPickupMixin {
         Boolean supportSimpleBackpack = ModConfig.getBoolean("SupportSimpleBackpack");
         if (supportSimpleBackpack == null) supportSimpleBackpack = true;
         // SimpleBackpackのサポート
+        /*
         if (supportSimpleBackpack && Registries.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
@@ -65,9 +59,12 @@ public class ItemPickupMixin {
             }
         }
 
+         */
+
         Boolean supportShulkerBox = ModConfig.getBoolean("SupportShulkerBox");
         if (supportShulkerBox == null) supportShulkerBox = true;
         // シュルカーボックスのサポート
+        /*
         if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("BlockEntityTag")) {
@@ -90,6 +87,7 @@ public class ItemPickupMixin {
             }
         }
 
+         */
         return false;
     }
 
@@ -110,10 +108,11 @@ public class ItemPickupMixin {
                 boolean checkedEnderChest = false;
                 // インベントリ
                 for (ItemStack inStack : player.getInventory().main) {
+
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
                         for (ItemStack enderChestStack : player.getEnderChestInventory().getHeldStacks()) {
-                            if (enderChestStack.hasNbt()) {
+                            if (!enderChestStack.getComponents().isEmpty()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;
                                     itemStack = ItemStack.EMPTY;
@@ -123,7 +122,7 @@ public class ItemPickupMixin {
                             }
                         }
                     }
-                    if (inStack.hasNbt()) {
+                    if (!inStack.getComponents().isEmpty()) {
                         if (process(inStack, itemStack)) {
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;
@@ -134,7 +133,7 @@ public class ItemPickupMixin {
 
                 if (!insertedBox) {
                     // オフハンド
-                    if (player.getOffHandStack().hasNbt()) {
+                    if (!player.getOffHandStack().getComponents().isEmpty()) {
                         if (process(player.getOffHandStack(), itemStack)) {
                             insertedBox = true;
                             itemStack = ItemStack.EMPTY;

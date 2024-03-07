@@ -27,10 +27,9 @@ public class StorageBoxSlot extends Slot {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack storageBoxStack = player.getMainHandStack();
-            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
+            removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+            removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
+            removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
             return;
         }
         ItemStack storageBoxStack = player.getMainHandStack();
@@ -43,12 +42,11 @@ public class StorageBoxSlot extends Slot {
         ItemStack storageBoxStack = player.getMainHandStack();
         if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
         if (amount == getStack().getCount()) {
-            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
+            removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+            removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
+            removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
         } else {
-            setItemDataAsInt(storageBoxStack, KEY_SIZE, getItemDataAsInt(storageBoxStack, KEY_SIZE) - amount);
+            setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - amount);
         }
         return super.takeStack(amount);
     }

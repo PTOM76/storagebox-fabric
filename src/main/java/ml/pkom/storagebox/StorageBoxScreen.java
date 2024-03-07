@@ -1,9 +1,7 @@
 package ml.pkom.storagebox;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -22,13 +20,6 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         int x = (this.width - this.backgroundWidth) / 2;
         int y = (this.height - this.backgroundHeight) / 2;
-
-        RenderSystem.setShader(GameRenderer::getPositionTexProgram);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        //RenderSystem.setShaderTexture(0, GUI);
-
-        //GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        //MinecraftClient.getInstance().getTextureManager().bindTexture(GUI);
         context.drawTexture(GUI, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight);
     }
 
@@ -43,7 +34,6 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        this.renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         this.drawMouseoverTooltip(context, mouseX, mouseY);
     }

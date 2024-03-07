@@ -6,7 +6,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColorProvider;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -15,8 +15,6 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
 import static ml.pkom.storagebox.StorageBoxItem.getItem;
@@ -58,35 +56,23 @@ public class StorageBoxClient implements ClientModInitializer {
                 if (player == null) return;
                 if (player.getMainHandStack() == null) return;
 
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && player.getMainHandStack().hasNbt()) {
+                if (player.getMainHandStack().getItem() instanceof StorageBoxItem && !player.getMainHandStack().isEmpty()) {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out_and_throw");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            ClientPlayNetworking.send(new KeyPayload("put_out_and_throw"));
                         } else {
                             // 取り出す or コンテナーへ一括収納: (: + Shift)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            ClientPlayNetworking.send(new KeyPayload("put_out"));
                         }
 
                     } else {
                         if (isKeyDownCtrl()) {
                             // AutoCollect切り替え: (: + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "auto_collect");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            ClientPlayNetworking.send(new KeyPayload("auto_collect"));
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_in");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            ClientPlayNetworking.send(new KeyPayload("put_in"));
                         }
                     }
                 }

@@ -3,7 +3,11 @@
   "minVersion": "0.8",
   "package": "ml.pkom.storagebox.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": ["KeyBindingAccessor", "ItemRendererAccessor", "RenderStorageBoxMixin"],
+  "mixins": [
+    "net.pitan76.storagebox.mixin.KeyBindingAccessor",
+    "net.pitan76.storagebox.mixin.ItemRendererAccessor",
+    "net.pitan76.storagebox.mixin.RenderStorageBoxMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

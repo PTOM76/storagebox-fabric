@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import ml.pkom.mcpitanlib.api.text.TextUtil;

@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;

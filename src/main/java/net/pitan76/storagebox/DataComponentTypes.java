@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.minecraft.component.DataComponentType;
 import net.minecraft.item.ItemStack;

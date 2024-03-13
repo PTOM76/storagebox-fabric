@@ -1,12 +1,11 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
-import ml.pkom.storagebox.mixin.KeyBindingAccessor;
+import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColorProvider;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
@@ -17,8 +16,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 
-import static ml.pkom.storagebox.StorageBoxItem.getItem;
-import static ml.pkom.storagebox.StorageBoxItem.getStackInStorageBox;
+import static net.pitan76.storagebox.StorageBoxItem.getItem;
+import static net.pitan76.storagebox.StorageBoxItem.getStackInStorageBox;
 
 public class StorageBoxClient implements ClientModInitializer {
 

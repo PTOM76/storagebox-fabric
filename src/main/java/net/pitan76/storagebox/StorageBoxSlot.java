@@ -1,11 +1,11 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 
-import static ml.pkom.storagebox.StorageBoxItem.*;
+import static net.pitan76.storagebox.StorageBoxItem.*;
 
 public class StorageBoxSlot extends Slot {
 

@@ -1,7 +1,7 @@
-package ml.pkom.storagebox.mixin;
+package net.pitan76.storagebox.mixin;
 
-import ml.pkom.storagebox.ItemRendererHooks;
-import ml.pkom.storagebox.StorageBoxItem;
+import net.pitan76.storagebox.ItemRendererHooks;
+import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -17,8 +17,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static ml.pkom.storagebox.StorageBoxItem.getStackInStorageBox;
-import static ml.pkom.storagebox.StorageBoxItem.hasStackInStorageBox;
+import static net.pitan76.storagebox.StorageBoxItem.getStackInStorageBox;
+import static net.pitan76.storagebox.StorageBoxItem.hasStackInStorageBox;
 
 @Mixin(ItemRenderer.class)
 public abstract class RenderStorageBoxMixin {

@@ -23,6 +23,7 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -62,6 +63,7 @@ public class StorageBoxItem extends Item {
         return getStackInStorageBox(storageBoxStack) != null;
     }
 
+    // nulll のときは hasStackInStorageBox(storageBoxStack) で判定すること
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
         ItemStack result;
         if (storageBoxStack.getComponents().isEmpty()) return null;
@@ -174,8 +176,10 @@ public class StorageBoxItem extends Item {
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
+            if (stack != null) {
             player.sendMessage(Text.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT), true, stack.getMaxCount())), true);
             return;
+            }
         }
         player.sendMessage(Text.literal("Empty"), true);
 

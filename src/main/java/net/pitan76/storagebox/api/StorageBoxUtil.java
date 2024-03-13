@@ -2,7 +2,6 @@ package net.pitan76.storagebox.api;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.pitan76.storagebox.DataComponentTypes;
 import net.pitan76.storagebox.StorageBoxItem;
 
 public class StorageBoxUtil {
@@ -39,7 +38,7 @@ public class StorageBoxUtil {
      * @return The amount of items
      */
     public static int getAmountInStorageBox(ItemStack storageBoxStack) {
-        return StorageBoxItem.getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+        return StorageBoxItem.getItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
     }
 
     /**
@@ -48,7 +47,7 @@ public class StorageBoxUtil {
      * @param amount The amount of items
      */
     public static void setAmountInStorageBox(ItemStack storageBoxStack, int amount) {
-        StorageBoxItem.setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, amount);
+        StorageBoxItem.setItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE, amount);
     }
 
     /**

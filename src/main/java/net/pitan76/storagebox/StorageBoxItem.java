@@ -2,6 +2,7 @@ package net.pitan76.storagebox;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.datafixer.fix.ItemIdFix;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -9,22 +10,21 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
+import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 public class StorageBoxItem extends Item {
     /*
@@ -44,21 +44,35 @@ public class StorageBoxItem extends Item {
         if (stack != null)
             return stack.getItem();
 
+        Optional<Item> item = fixItemId(storageBoxStack);
+        return item.orElse(null);
+    }
+
+    public static Optional<Item> fixItemId(ItemStack storageBoxStack) {
         // 1.12以前の数値IDのみしか含まれていない場合
         int itemId = getItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-        if (itemId == 0) return null;
 
-        int size = getItemDataAsInt(storageBoxStack, KEY_SIZE);
-        if (size > 0)
-            return Item.byRawId(itemId);
+        if (itemId != 0 && getItemDataAsInt(storageBoxStack, KEY_SIZE) > 0) {
+            Item item;
+            if (Registries.ITEM.containsId(new Identifier(ItemIdFix.fromId(itemId)))) {
+                item = Registries.ITEM.get(new Identifier(ItemIdFix.fromId(itemId)));
+            } else {
+                item = Item.byRawId(itemId);
+            }
 
-        return null;
+            setItemStack(storageBoxStack, new ItemStack(item));
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
+            return Optional.of(item);
+        }
+
+        return Optional.empty();
     }
 
     public static boolean hasStackInStorageBox(ItemStack storageBoxStack) {
         return getStackInStorageBox(storageBoxStack) != null;
     }
 
+    // null のときは hasStackInStorageBox(storageBoxStack) で判定すること
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
         ItemStack result;
         if (!storageBoxStack.hasNbt()) return null;
@@ -75,10 +89,7 @@ public class StorageBoxItem extends Item {
             storageBoxStack.setNbt(nbt);
         }
         if (nbt.contains(KEY_ITEM_ID)) {
-            int itemId = getItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-
-            if (itemId != 0 && getItemDataAsInt(storageBoxStack, KEY_SIZE) > 0)
-                return new ItemStack(Item.byRawId(itemId));
+            return fixItemId(storageBoxStack).map(ItemStack::new).orElse(null);
         }
 
         if (!nbt.contains(KEY_ITEM_DATA)) return null;

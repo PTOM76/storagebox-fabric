@@ -1,7 +1,7 @@
-package ml.pkom.storagebox.mixin;
+package net.pitan76.storagebox.mixin;
 
-import ml.pkom.storagebox.ModConfig;
-import ml.pkom.storagebox.StorageBoxItem;
+import net.pitan76.storagebox.ModConfig;
+import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static ml.pkom.storagebox.StorageBoxItem.*;
+import static net.pitan76.storagebox.StorageBoxItem.*;
 
 @Mixin(ItemEntity.class)
 public class ItemPickupMixin {

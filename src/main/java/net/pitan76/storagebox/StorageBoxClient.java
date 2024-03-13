@@ -1,6 +1,6 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
-import ml.pkom.storagebox.mixin.KeyBindingAccessor;
+import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -19,9 +19,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
-import static ml.pkom.storagebox.StorageBoxItem.getItem;
-import static ml.pkom.storagebox.StorageBoxItem.getStackInStorageBox;
-
 public class StorageBoxClient implements ClientModInitializer {
 
     private static KeyBinding keyBinding_COLON;
@@ -37,10 +34,10 @@ public class StorageBoxClient implements ClientModInitializer {
         HandledScreens.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
 
         ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
-            ItemStack stack = getStackInStorageBox(storageBoxStack);
+            ItemStack stack = StorageBoxItem.getStackInStorageBox(storageBoxStack);
             if (stack == null || stack.isEmpty()) return -1;
             if (stack.getItem() instanceof ItemColorProvider) {
-                ItemColorProvider provider = (ItemColorProvider) getItem(stack);
+                ItemColorProvider provider = (ItemColorProvider) StorageBoxItem.getItem(stack);
                 return provider.getColor(stack, tintIndex);
             }
 

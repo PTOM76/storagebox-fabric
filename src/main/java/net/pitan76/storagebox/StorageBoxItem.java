@@ -426,7 +426,7 @@ public class StorageBoxItem extends Item {
     }
 
     // 0 = 取り出し(インベントリオープン時はコンテナーへ収納) 1 = 取り出してドロップ 2 = ストレージボックスへ収納(インベントリオープン時はコンテナーからストレージボックスへ収納) 3 = AutoCollect切り替え
-    public void keyboardEvent(int type, PlayerEntity player, ItemStack storageBoxStack) {
+    public static void keyboardEvent(int type, PlayerEntity player, ItemStack storageBoxStack) {
         if (type == 0) {
             if (player.currentScreenHandler != null && !(player.currentScreenHandler instanceof PlayerScreenHandler) && !(player.currentScreenHandler.slots.size() <= 0)) {
                 // コンテナー

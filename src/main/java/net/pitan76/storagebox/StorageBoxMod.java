@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;

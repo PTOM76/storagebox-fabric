@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.item.TooltipContext;

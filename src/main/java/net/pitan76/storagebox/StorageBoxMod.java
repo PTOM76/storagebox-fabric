@@ -1,7 +1,6 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.recipe.SpecialRecipeSerializer;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.Level;

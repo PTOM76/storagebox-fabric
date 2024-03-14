@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;

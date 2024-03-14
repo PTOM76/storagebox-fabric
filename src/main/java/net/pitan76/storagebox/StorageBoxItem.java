@@ -20,6 +20,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -53,8 +54,8 @@ public class StorageBoxItem extends Item {
 
         if (itemId != 0 && getItemDataAsInt(storageBoxStack, KEY_SIZE) > 0) {
             Item item;
-            if (Registries.ITEM.containsId(new Identifier(ItemIdFix.fromId(itemId)))) {
-                item = Registries.ITEM.get(new Identifier(ItemIdFix.fromId(itemId)));
+            if (Registry.ITEM.containsId(new Identifier(ItemIdFix.fromId(itemId)))) {
+                item = Registry.ITEM.get(new Identifier(ItemIdFix.fromId(itemId)));
             } else {
                 item = Item.byRawId(itemId);
             }
@@ -619,6 +620,8 @@ public class StorageBoxItem extends Item {
 
         return false;
     }
+
+
 
     public static boolean canInsertStack(ItemStack stack) {
         if (stack.getItem() == StorageBoxItem.instance) return false;

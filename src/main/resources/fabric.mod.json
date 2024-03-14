@@ -18,9 +18,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "ml.pkom.storagebox.StorageBoxMod"
+      "net.pitan76.storagebox.StorageBoxMod"
     ],
-    "client": ["ml.pkom.storagebox.StorageBoxClient"]
+    "client": [
+      "net.pitan76.storagebox.StorageBoxClient"
+    ]
   },
   "mixins": [
     {

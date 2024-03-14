@@ -1,13 +1,11 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
-import ml.pkom.storagebox.mixin.ItemRendererAccessor;
+import net.pitan76.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
-
-import static ml.pkom.storagebox.StorageBoxItem.*;
 
 public class ItemRendererHooks {
 
@@ -19,8 +17,8 @@ public class ItemRendererHooks {
         ClientWorld world = MinecraftClient.getInstance().world;
 
         if (world == null) return false;
-        if (!hasStackInStorageBox(stack)) return false;
-        ItemStack renderStack = getStackInStorageBox(stack).copy();
+        if (!StorageBoxItem.hasStackInStorageBox(stack)) return false;
+        ItemStack renderStack = StorageBoxItem.getStackInStorageBox(stack).copy();
 
         if (renderStack.isEmpty()) return false;
 

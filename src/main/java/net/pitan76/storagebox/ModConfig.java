@@ -1,4 +1,4 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

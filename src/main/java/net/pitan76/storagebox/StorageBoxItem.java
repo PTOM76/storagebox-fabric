@@ -10,7 +10,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
@@ -20,6 +19,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -53,8 +53,8 @@ public class StorageBoxItem extends Item {
 
         if (itemId != 0 && getItemDataAsInt(storageBoxStack, KEY_SIZE) > 0) {
             Item item;
-            if (Registries.ITEM.containsId(new Identifier(ItemIdFix.fromId(itemId)))) {
-                item = Registries.ITEM.get(new Identifier(ItemIdFix.fromId(itemId)));
+            if (Registry.ITEM.containsId(new Identifier(ItemIdFix.fromId(itemId)))) {
+                item = Registry.ITEM.get(new Identifier(ItemIdFix.fromId(itemId)));
             } else {
                 item = Item.byRawId(itemId);
             }

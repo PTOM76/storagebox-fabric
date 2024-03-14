@@ -1,6 +1,6 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
-import ml.pkom.storagebox.mixin.KeyBindingAccessor;
+import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -19,8 +19,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
-import static ml.pkom.storagebox.StorageBoxItem.getItem;
-import static ml.pkom.storagebox.StorageBoxItem.getStackInStorageBox;
+import static net.pitan76.storagebox.StorageBoxItem.getItem;
+import static net.pitan76.storagebox.StorageBoxItem.getStackInStorageBox;
 
 public class StorageBoxClient implements ClientModInitializer {
 

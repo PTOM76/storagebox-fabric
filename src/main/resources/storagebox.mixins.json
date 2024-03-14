@@ -3,7 +3,10 @@
   "minVersion": "0.8",
   "package": "ml.pkom.storagebox.mixin",
   "compatibilityLevel": "JAVA_8",
-  "mixins": ["ItemPickupMixin", "ItemEntityAccessor"],
+  "mixins": [
+    "net.pitan76.storagebox.mixin.ItemPickupMixin",
+    "net.pitan76.storagebox.mixin.ItemEntityAccessor"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -1,11 +1,9 @@
-package ml.pkom.storagebox;
+package net.pitan76.storagebox;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
-
-import static ml.pkom.storagebox.StorageBoxItem.*;
 
 public class StorageBoxSlot extends Slot {
 
@@ -27,15 +25,15 @@ public class StorageBoxSlot extends Slot {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack storageBoxStack = player.getMainHandStack();
-            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_DATA);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_ID);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_AUTO);
             return;
         }
         ItemStack storageBoxStack = player.getMainHandStack();
-        setItemStack(storageBoxStack, itemStack.copy());
-        setItemStackSize(storageBoxStack, itemStack.getCount());
+        StorageBoxItem.setItemStack(storageBoxStack, itemStack.copy());
+        StorageBoxItem.setItemStackSize(storageBoxStack, itemStack.getCount());
     }
 
     @Override
@@ -43,12 +41,12 @@ public class StorageBoxSlot extends Slot {
         ItemStack storageBoxStack = player.getMainHandStack();
         if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
         if (amount == getStack().getCount()) {
-            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
-            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
-            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_DATA);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_ID);
+            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_AUTO);
         } else {
-            setItemDataAsInt(storageBoxStack, KEY_SIZE, getItemDataAsInt(storageBoxStack, KEY_SIZE) - amount);
+            StorageBoxItem.setItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE, StorageBoxItem.getItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE) - amount);
         }
         return super.takeStack(amount);
     }

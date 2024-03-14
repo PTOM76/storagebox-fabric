@@ -1,4 +1,4 @@
-package ml.pkom.storagebox.mixin;
+package net.pitan76.storagebox.mixin;
 
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;

@@ -1,7 +1,7 @@
-package ml.pkom.storagebox.mixin;
+package net.pitan76.storagebox.mixin;
 
-import ml.pkom.storagebox.ModConfig;
-import ml.pkom.storagebox.StorageBoxItem;
+import net.pitan76.storagebox.ModConfig;
+import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.ItemEntity;
@@ -22,8 +22,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static ml.pkom.storagebox.StorageBoxItem.*;
-
 @Mixin(ItemEntity.class)
 public class ItemPickupMixin {
 
@@ -32,11 +30,11 @@ public class ItemPickupMixin {
         // ストレージボックス
         if (stack.getItem() instanceof StorageBoxItem) {
             if (!StorageBoxItem.isAutoCollect(stack)) return false;
-            ItemStack stackInNbt = getStackInStorageBox(stack);
+            ItemStack stackInNbt = StorageBoxItem.getStackInStorageBox(stack);
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxItem.canInsertStack(pickupStack, stack)) return false;
-                setItemStackSize(stack, getItemDataAsInt(stack, KEY_SIZE) + pickupStack.getCount());
+                StorageBoxItem.setItemStackSize(stack, StorageBoxItem.getItemDataAsInt(stack, StorageBoxItem.KEY_SIZE) + pickupStack.getCount());
                 return true;
             }
         }

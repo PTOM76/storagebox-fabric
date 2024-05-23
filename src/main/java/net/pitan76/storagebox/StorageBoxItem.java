@@ -2,7 +2,7 @@ package net.pitan76.storagebox;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.client.item.TooltipType;
 import net.minecraft.component.DataComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -539,8 +539,8 @@ public class StorageBoxItem extends Item {
     }
 
     @Override
-    public void appendTooltip(ItemStack storageBoxStack, World world, List<Text> tooltip, TooltipContext context) {
-        super.appendTooltip(storageBoxStack, world, tooltip, context);
+    public void appendTooltip(ItemStack storageBoxStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        super.appendTooltip(storageBoxStack, context, tooltip, type);
         if (hasStackInStorageBox(storageBoxStack)) {
             Item item = getItem(storageBoxStack);
             ItemStack stack = getStackInStorageBox(storageBoxStack);
@@ -551,7 +551,7 @@ public class StorageBoxItem extends Item {
             tooltip.add(Text.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
             tooltip.add(Text.literal("§7[Information]"));
             if (item != null)
-                item.appendTooltip(stack, world, tooltip, context);
+                item.appendTooltip(stack, context, tooltip, type);
         }
     }
 

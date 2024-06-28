@@ -1,10 +1,10 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.World;
 
@@ -14,11 +14,11 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public boolean matches(RecipeInputInventory inventory, World world) {
+    public boolean matches(CraftingRecipeInput input, World world) {
         int count = 0;
 
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
+        for (int i = 0; i < input.getStacks().size(); ++i) {
+            ItemStack stack = input.getStacks().get(i);
             if (stack.isEmpty()) continue;
             ++count;
             if (!(stack.getItem() instanceof StorageBoxItem)) return false;
@@ -27,9 +27,9 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(RecipeInputInventory inventory, RegistryWrapper.WrapperLookup lookup) {
-        for (int i = 0; i < inventory.size(); ++i) {
-            ItemStack stack = inventory.getStack(i);
+    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
+        for (int i = 0; i < input.getStacks().size(); ++i) {
+            ItemStack stack = input.getStacks().get(i);
             if (stack.isEmpty()) continue;
             if (!(stack.getItem() instanceof StorageBoxItem)) continue;
 

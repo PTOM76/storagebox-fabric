@@ -2,14 +2,14 @@ package net.pitan76.storagebox;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipType;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.component.ComponentType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
@@ -98,7 +98,7 @@ public class StorageBoxItem extends Item {
     }
 
     // stackのコンポーネントから数値のデータを取り出す
-    public static int getComponentAsInt(ItemStack storageBoxStack, DataComponentType<Integer> type) {
+    public static int getComponentAsInt(ItemStack storageBoxStack, ComponentType<Integer> type) {
         int data = 0;
         //NbtCompound nbt = storageBoxStack.getNbt();
 
@@ -135,18 +135,18 @@ public class StorageBoxItem extends Item {
         setComponentAsInt(storageBoxStack, DataComponentTypes.AUTO_COLLECT, value);
     }
 
-    public static void setComponentAsInt(ItemStack storageBoxStack, DataComponentType<Integer> type, int data) {
+    public static void setComponentAsInt(ItemStack storageBoxStack, ComponentType<Integer> type, int data) {
         storageBoxStack.set(type, data);
     }
 
-    public static void setComponentStack(ItemStack storageBoxStack, DataComponentType<ItemStack> type, ItemStack stack) {
+    public static void setComponentStack(ItemStack storageBoxStack, ComponentType<ItemStack> type, ItemStack stack) {
         if (!stack.isEmpty())
             storageBoxStack.set(type, stack);
         else
             storageBoxStack.remove(type);
     }
 
-    public static void removeComponent(ItemStack storageBoxStack, DataComponentType<?> type) {
+    public static void removeComponent(ItemStack storageBoxStack, ComponentType<?> type) {
         storageBoxStack.remove(type);
     }
 
@@ -329,15 +329,15 @@ public class StorageBoxItem extends Item {
     }
 
     @Override
-    public int getMaxUseTime(ItemStack storageBoxStack) {
+    public int getMaxUseTime(ItemStack storageBoxStack, LivingEntity entity) {
         Item item = getItem(storageBoxStack);
 
         if (item != null) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
-            return item.getMaxUseTime(stack);
+            return item.getMaxUseTime(stack, entity);
         }
 
-        return super.getMaxUseTime(storageBoxStack);
+        return super.getMaxUseTime(storageBoxStack, entity);
     }
 
     @Override

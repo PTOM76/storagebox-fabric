@@ -1,7 +1,9 @@
 package net.pitan76.storagebox.mixin;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stat.Stats;
@@ -107,11 +109,11 @@ public class ItemPickupMixin {
                 // インベントリ
                 for (ItemStack inStack : player.inventory.field_15082) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
-                    /*
-                    if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {
+
+                    if (supportEnderChest && inStack.getItem() == BlockItem.fromBlock(Blocks.ENDERCHEST) && !checkedEnderChest) {
                         for (int i = 0; i < player.getEnderChestInventory().getInvSize(); i++) {
                             ItemStack enderChestStack = player.getEnderChestInventory().getInvStack(i);
-                            if (enderChestStack.hasTag()) {
+                            if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;
                                     itemStack = ItemStack.EMPTY;
@@ -122,7 +124,7 @@ public class ItemPickupMixin {
                         }
                     }
 
-                     */
+
                     if (inStack.hasNbt()) {
                         if (process(inStack, itemStack)) {
                             insertedBox = true;

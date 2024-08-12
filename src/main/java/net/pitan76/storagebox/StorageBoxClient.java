@@ -32,8 +32,6 @@ public class StorageBoxClient implements ClientModInitializer {
 
         ItemModelRegistry.registerItemModel(StorageBoxItem.instance, StorageBoxMod.id("storagebox"));
 
-
-
         //.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
 
         /*

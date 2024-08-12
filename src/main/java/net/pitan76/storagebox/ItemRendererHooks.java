@@ -2,14 +2,13 @@ package net.pitan76.storagebox;
 
 import net.pitan76.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 
 public class ItemRendererHooks {
+    /*
 
     private static final ThreadLocal<ItemStack> OVERRIDING_FOR = new ThreadLocal<>();
 
@@ -35,4 +34,6 @@ public class ItemRendererHooks {
         }
         return true;
     }
+
+     */
 }

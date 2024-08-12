@@ -1,23 +1,19 @@
 package net.pitan76.storagebox;
 
-import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
+import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.legacyfabric.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.legacyfabric.fabric.api.networking.v1.PacketByteBufs;
+import net.legacyfabric.fabric.api.registry.v1.RegistryHelper;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.color.item.ItemColorProvider;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import org.lwjgl.glfw.GLFW;
-
-import static net.pitan76.storagebox.StorageBoxItem.getItem;
-import static net.pitan76.storagebox.StorageBoxItem.getStackInStorageBox;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.PacketByteBuf;
+import net.pitan76.storagebox.mixin.KeyBindingAccessor;
+import org.lwjgl.input.Keyboard;
 
 public class StorageBoxClient implements ClientModInitializer {
 
@@ -27,12 +23,13 @@ public class StorageBoxClient implements ClientModInitializer {
     public void onInitializeClient() {
         keyBinding_COLON = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.storagebox.colon",
-                InputUtil.Type.KEYSYM,
-                GLFW.GLFW_KEY_APOSTROPHE,
+                Keyboard.KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
-        HandledScreens.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
 
+        //.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
+
+        /*
         ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             if (stack == null || stack.isEmpty()) return -1;
@@ -49,7 +46,11 @@ public class StorageBoxClient implements ClientModInitializer {
 
         }), StorageBoxItem.instance);
 
+         */
+
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            /*
             if (isKeyPressed()) {
                 PlayerEntity player = client.player;
                 if (player == null) return;
@@ -59,23 +60,37 @@ public class StorageBoxClient implements ClientModInitializer {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
-                            ClientPlayNetworking.send(new KeyPayload("put_out_and_throw"));
+                            PacketByteBuf BUF = PacketByteBufs.create();
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out_and_throw");
+                            BUF.writeNbtCompound(tag);
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
                             // 取り出す or コンテナーへ一括収納: (: + Shift)
-                            ClientPlayNetworking.send(new KeyPayload("put_out"));
+                            PacketByteBuf BUF = PacketByteBufs.create();
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out");
+                            BUF.writeNbtCompound(tag);
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
 
                     } else {
                         if (isKeyDownCtrl()) {
                             // AutoCollect切り替え: (: + Ctrl)
-                            ClientPlayNetworking.send(new KeyPayload("auto_collect"));
+                            PacketByteBuf BUF = PacketByteBufs.create();
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "auto_collect");
+                            BUF.writeNbtCompound(tag);
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
-                            ClientPlayNetworking.send(new KeyPayload("put_in"));
+                            PacketByteBuf BUF = PacketByteBufs.create();
+                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_in");
+                            BUF.writeNbtCompound(tag);
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
                         }
                     }
                 }
             }
+
+             */
             if (client.player != null) {
                 PlayerEntity player = client.player;
                 if (player.getMainHandStack().getItem() instanceof StorageBoxItem)
@@ -87,9 +102,10 @@ public class StorageBoxClient implements ClientModInitializer {
 
     private int coolDown = 0;
 
+    /*
     private boolean isKeyPressed() {
-        final Window mw = MinecraftClient.getInstance().getWindow();
-        if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
+        Window mw = new Window(MinecraftClient.getInstance());
+        if (.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
             if (coolDown <= 0) {
                 coolDown = 3;
                 return true;
@@ -111,4 +127,6 @@ public class StorageBoxClient implements ClientModInitializer {
         return InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)
                 || InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
+
+     */
 }

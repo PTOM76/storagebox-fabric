@@ -3,30 +3,18 @@ package net.pitan76.storagebox;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.slot.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
 
 public class StorageBoxScreenHandler extends ScreenHandler {
-
-    public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
-
     public static void init() {
-        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new, FeatureSet.empty()));
     }
 
     private final Inventory inventory;
 
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        this(syncId, playerInventory);
-    }
-
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
-        super(SCREEN_HANDLER_TYPE, syncId);
+    public StorageBoxScreenHandler(PlayerInventory playerInventory) {
+        super();
         inventory = new StorageBoxInventory();
         int m, l;
 
@@ -43,21 +31,21 @@ public class StorageBoxScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return inventory.canPlayerUse(player);
+        return inventory.canPlayerUseInv(player);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+            if (invSlot < this.inventory.getInvSize()) {
+                if (!this.insertItem(originalStack, this.inventory.getInvSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            } else if (!this.insertItem(originalStack, 0, this.inventory.getInvSize(), false)) {
                 return ItemStack.EMPTY;
             }
 

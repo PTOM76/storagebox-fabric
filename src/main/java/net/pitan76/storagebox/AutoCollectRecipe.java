@@ -1,14 +1,10 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.inventory.RecipeInputInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.world.World;
 
-public class AutoCollectRecipe extends SpecialCraftingRecipe {
+public class AutoCollectRecipe {// extends SpecialCraftingRecipe {
+    /*
     public AutoCollectRecipe(CraftingRecipeCategory category) {
         super(category);
     }
@@ -50,4 +46,6 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     public RecipeSerializer<?> getSerializer() {
         return StorageBoxRecipeSerializer.CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES;
     }
+
+     */
 }

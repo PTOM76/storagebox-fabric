@@ -1,9 +1,8 @@
 package net.pitan76.storagebox;
 
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
+import net.legacyfabric.fabric.api.registry.v1.RegistryHelper;
+import net.legacyfabric.fabric.api.util.Identifier;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,12 +15,11 @@ public class StorageBoxMod implements ModInitializer
 
     @Override
     public void onInitialize() {
-        DataComponentTypes.init();
 
-        Registry.register(Registries.ITEM, id("storagebox"), StorageBoxItem.instance);
+        RegistryHelper.registerItem(StorageBoxItem.instance, id("storagebox"));
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
-        StorageBoxRecipeSerializer.init();
+        //StorageBoxRecipeSerializer.init();
 
         ModConfig.init();
     }
@@ -33,5 +31,9 @@ public class StorageBoxMod implements ModInitializer
 
     public static Identifier id(String id) {
         return new Identifier(MOD_ID, id);
+    }
+
+    public static net.minecraft.util.Identifier id_mc(String id) {
+        return new net.minecraft.util.Identifier(MOD_ID, id);
     }
 }

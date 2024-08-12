@@ -3,12 +3,8 @@ package net.pitan76.storagebox.mixin;
 import net.pitan76.storagebox.ItemRendererHooks;
 import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +19,7 @@ import static net.pitan76.storagebox.StorageBoxItem.hasStackInStorageBox;
 @Mixin(ItemRenderer.class)
 public abstract class RenderStorageBoxMixin {
 
+    /*
     @Shadow public abstract void renderItem(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model);
 
     @Inject(method = "renderBakedItemModel", at = @At("HEAD"), cancellable = true)
@@ -54,4 +51,6 @@ public abstract class RenderStorageBoxMixin {
         }
         ci.cancel();
     }
+
+     */
 }

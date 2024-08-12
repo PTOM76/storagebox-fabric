@@ -5,6 +5,6 @@ import net.minecraft.inventory.SimpleInventory;
 public class StorageBoxInventory extends SimpleInventory {
 
     public StorageBoxInventory() {
-        super(1);
+        super("storageboxinv", false, 1);
     }
 }

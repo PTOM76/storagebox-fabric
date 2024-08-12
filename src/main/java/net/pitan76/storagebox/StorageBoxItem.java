@@ -1,27 +1,27 @@
 package net.pitan76.storagebox;
 
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.item.TooltipType;
-import net.minecraft.component.DataComponentType;
+import net.minecraft.client.TooltipContext;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.slot.Slot;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.itemgroup.ItemGroup;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
-import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,7 +35,6 @@ public class StorageBoxItem extends Item {
     - StorageItemData(ItemStack): ItemStack (アイテムのスタックデータ) Ex. ItemStack.fromNbt(nbt)
      */
 
-    public static String KEY_ITEM_ID = "StorageItem"; // Old
     public static String KEY_SIZE = "StorageSize";
     public static String KEY_AUTO = "StorageAuto"; // 0 = true, 1 = false
     public static String KEY_ITEM_DATA = "StorageItemData";
@@ -45,17 +44,6 @@ public class StorageBoxItem extends Item {
         if (stack != null)
             return stack.getItem();
 
-        // 1.12以前の数値IDのみしか含まれていない場合
-        /*
-        int itemId = getComponentAsInt(storageBoxStack, KEY_ITEM_ID);
-        if (itemId == 0) return null;
-
-        int size = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-        if (size > 0)
-            return Item.byRawId(itemId)
-            ;
-         */
-
         return null;
     }
 
@@ -63,15 +51,15 @@ public class StorageBoxItem extends Item {
         return getStackInStorageBox(storageBoxStack) != null;
     }
 
-    // nulll のときは hasStackInStorageBox(storageBoxStack) で判定すること
+    // null のときは hasStackInStorageBox(storageBoxStack) で判定すること
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
         ItemStack result;
-        if (storageBoxStack.getComponents().isEmpty()) return null;
+        if (!storageBoxStack.hasNbt()) return null;
+        NbtCompound nbt = storageBoxStack.getNbt();
 
-        /*
         // 以前のシステムとの互換性
         if (nbt.contains("item")) {
-            setItemStack(storageBoxStack, ItemStack.fromNbt(nbt.getCompound("item")));
+            setItemStack(storageBoxStack, new ItemStack(nbt.getCompound("item")));
             if (nbt.contains("countInBox")) {
                 setItemStackSize(storageBoxStack, nbt.getInt("countInBox"));
                 nbt.remove("countInBox");
@@ -80,35 +68,42 @@ public class StorageBoxItem extends Item {
             storageBoxStack.setNbt(nbt);
         }
 
+        if (!nbt.contains(KEY_ITEM_DATA)) return null;
 
-        if (nbt.contains(KEY_ITEM_ID)) {
-            int itemId = getComponentAsInt(storageBoxStack, KEY_ITEM_ID);
+        nbt = nbt.getCompound(KEY_ITEM_DATA);
+        if (nbt.isEmpty()) return null;
 
-            if (itemId != 0 && getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) > 0)
-                return new ItemStack(Item.byRawId(itemId));
+        // convert 1.12 Item ID
+        /*
+        if (nbt.contains("Damage", 99)) {
+            String old = nbt.getString("id");
+            int oldDamage = Math.max(0, nbt.getShort("Damage"));
+            String newId = StorageBoxUtil.oldItemIDtoNewItemID(old, oldDamage);
+            if (!old.equals(newId)) {
+                // update item id
+                nbt.putString("id", newId);
+            }
         }
+        */
+        result = new ItemStack(nbt);
+        result.setCount(1);
 
-         */
-
-        if (!storageBoxStack.contains(DataComponentTypes.ITEM_DATA)) return null;
-
-        ItemStack stack = storageBoxStack.get(DataComponentTypes.ITEM_DATA).copy();
-        stack.setCount(1);
-        return stack;
+        return result;
     }
 
-    // stackのコンポーネントから数値のデータを取り出す
-    public static int getComponentAsInt(ItemStack storageBoxStack, DataComponentType<Integer> type) {
+    // stackのNBTから数値のデータを取り出す
+    public static int getItemDataAsInt(ItemStack storageBoxStack, String key) {
+
         int data = 0;
-        //NbtCompound nbt = storageBoxStack.getNbt();
+        NbtCompound nbt = storageBoxStack.getNbt();
 
-        if (storageBoxStack.contains(type)) {
-            //if (key.equals(DataComponentTypes.ITEM_COUNT) && nbt.contains("countInBox"))
-            //    return nbt.getInt("countInBox");
+        if (nbt != null) {
+            if (key.equals(KEY_SIZE) && nbt.contains("countInBox"))
+                return nbt.getInt("countInBox");
 
-            data = storageBoxStack.get(type);
+            data = nbt.getInt(key);
         }
-        if (type.equals(DataComponentTypes.AUTO_COLLECT) && !storageBoxStack.contains(type)) {
+        if (key.equals(KEY_AUTO) && (nbt == null || !nbt.contains(key))) {
             // 0 = true, 1 = false
             Boolean defaultAutoCollect = ModConfig.getBoolean("DefaultAutoCollect");
             if (defaultAutoCollect == null) return 0;
@@ -119,69 +114,86 @@ public class StorageBoxItem extends Item {
     }
 
     public static boolean isAutoCollect(ItemStack storageBoxStack) {
-        /*
         if (storageBoxStack.hasNbt()) {
             NbtCompound nbt = storageBoxStack.getNbt();
-            if (!nbt.contains(DataComponentTypes.AUTO_COLLECT) && nbt.contains("autoCollect")) {
+            if (!nbt.contains(KEY_AUTO) && nbt.contains("autoCollect")) {
                 return nbt.getBoolean("autoCollect");
             }
         }
-        */
-        return getComponentAsInt(storageBoxStack, DataComponentTypes.AUTO_COLLECT) == 0;
+        return getItemDataAsInt(storageBoxStack, KEY_AUTO) == 0;
     }
 
     public static void changeAutoCollect(ItemStack storageBoxStack) {
         int value = isAutoCollect(storageBoxStack) ? 1 : 0;
-        setComponentAsInt(storageBoxStack, DataComponentTypes.AUTO_COLLECT, value);
+        setItemDataAsInt(storageBoxStack, KEY_AUTO, value);
     }
 
-    public static void setComponentAsInt(ItemStack storageBoxStack, DataComponentType<Integer> type, int data) {
-        storageBoxStack.set(type, data);
+    public static void setItemDataAsInt(ItemStack storageBoxStack, String key, int data) {
+        NbtCompound stackNbt = storageBoxStack.getNbt();
+        if (stackNbt == null) stackNbt = new NbtCompound();
+
+        stackNbt.putInt(key, data);
+        storageBoxStack.setNbt(stackNbt);
     }
 
-    public static void setComponentStack(ItemStack storageBoxStack, DataComponentType<ItemStack> type, ItemStack stack) {
-        if (!stack.isEmpty())
-            storageBoxStack.set(type, stack);
-        else
-            storageBoxStack.remove(type);
+    public static void setItemDataAsInt(ItemStack storageBoxStack, String key, NbtCompound nbt) {
+        NbtCompound stackNbt = storageBoxStack.getNbt();
+        if (stackNbt == null) stackNbt = new NbtCompound();
+
+        if (nbt != null)
+            stackNbt.put(key, nbt);
+        else if (stackNbt.contains(key)) stackNbt.remove(key);
+        storageBoxStack.setNbt(stackNbt);
     }
 
-    public static void removeComponent(ItemStack storageBoxStack, DataComponentType<?> type) {
-        storageBoxStack.remove(type);
+    public static void removeItemDataAsInt(ItemStack stack, String key) {
+        setItemDataAsInt(stack, key, null);
     }
 
     public static void setItemStack(ItemStack storageBoxStack, ItemStack newStack) {
         if (storageBoxStack == ItemStack.EMPTY) return;
         if (newStack == null || ItemStack.EMPTY == newStack || newStack.isEmpty()) {
-            setComponentStack(storageBoxStack, DataComponentTypes.ITEM_DATA, ItemStack.EMPTY);
+            setItemDataAsInt(storageBoxStack, KEY_ITEM_DATA, null);
             return;
         }
-
-        setComponentStack(storageBoxStack, DataComponentTypes.ITEM_DATA, newStack);
+        NbtCompound nbt = new NbtCompound();
+        newStack.toNbt(nbt);
+        setItemDataAsInt(storageBoxStack, KEY_ITEM_DATA, nbt);
     }
 
     public static void setItemStackSize(ItemStack storageBoxStack, int size) {
         if (storageBoxStack == ItemStack.EMPTY) return;
-        setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, size);
+        setItemDataAsInt(storageBoxStack, KEY_SIZE, size);
     }
 
     //
-    public static StorageBoxItem instance = new StorageBoxItem(new Settings());
+    public static StorageBoxItem instance = new StorageBoxItem();
 
-    public StorageBoxItem(Settings settings) {
-        super(settings.maxCount(1));
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(entries -> entries.add(this));
+    public StorageBoxItem() {
+        setMaxCount(1);
+        setItemGroup(ItemGroup.TOOLS);
 
     }
+
+    @Override
+    public String getDisplayName(ItemStack stack) {
+        return super.getDisplayName(stack);
+    }
+
+    @Override
+    public String getItemStackTranslatedName(ItemStack stack) {
+        return super.getItemStackTranslatedName(stack);
+    }
+
     public static void showBar(PlayerEntity player, ItemStack storageBoxStack) {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             if (stack != null) {
-            player.sendMessage(Text.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT), true, stack.getMaxCount())), true);
+            player.sendMessage(new LiteralText(stack.getCustomName() + "/" + calcItemNumByUnit(getItemDataAsInt(storageBoxStack, KEY_SIZE), true, stack.getMaxCount())), true);
             return;
             }
         }
-        player.sendMessage(Text.literal("Empty"), true);
+        player.sendMessage(new LiteralText("Empty"), true);
 
     }
 
@@ -194,12 +206,12 @@ public class StorageBoxItem extends Item {
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    public TypedActionResult<ItemStack> method_13649(World world, PlayerEntity user, Hand hand) {
         ItemStack storageBoxStack = user.getStackInHand(hand);
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             boolean canUse = true;
-            int countInBox = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+            int countInBox = getItemDataAsInt(storageBoxStack, KEY_SIZE);
             int itemInBoxCount = countInBox;
             boolean countIsOverMax = false;
             if (countInBox > 64) {
@@ -208,34 +220,37 @@ public class StorageBoxItem extends Item {
                 countInBox -= 64;
             }
             stack.setCount(0);
-            user.setStackInHand(hand, stack);
+            user.equipStack(hand, stack);
             stack.setCount(itemInBoxCount);
 
             TypedActionResult<ItemStack> result;
 
-            result = stack.use(world, user, hand);
-            if (!result.equals(TypedActionResult.success(stack)) || !result.equals(TypedActionResult.consume(stack)))
+            result = new TypedActionResult<>(stack.use(user, world, user.pos, hand, user.getHorizontalDirection(), user.pos.getX(), user.pos.getY(), user.pos.getZ()), stack);
+            if (!result.equals(new TypedActionResult<>(ActionResult.SUCCESS, stack))) // + CONSUME
                 canUse = false;
 
             int i = storageBoxStack.getCount();
             storageBoxStack.setCount(0);
-            user.setStackInHand(hand, storageBoxStack);
+            user.equipStack(hand, storageBoxStack);
             storageBoxStack.setCount(i);
 
 
-            if (result.getResult() == ActionResult.FAIL) {
-                return new TypedActionResult<>(result.getResult(), storageBoxStack);
-            } else if (stack.getItem().equals(result.getValue().getItem())) {
+            if (result.getActionResult() == ActionResult.FAIL) {
+                return new TypedActionResult<>(result.getActionResult(), storageBoxStack);
+            } else if (stack.getItem().equals(result.getObject().getItem())) {
                 // 食べ物など一定の時間を使って消費するアイテム
-                if (user.isUsingItem()) {
+                /*if (user.isUsingItem()) {
                     user.stopUsingItem();
                     user.setCurrentHand(hand);
                 }
+
+                 */
             } else {
                 // バケツ => 液体バケツなどのサポート
-                if (!result.getValue().isEmpty())
-                    user.getInventory().offerOrDrop(result.getValue());
-                if (result.getResult().equals(ActionResult.CONSUME)) {
+                if (!result.getObject().isEmpty())
+                    user.inventory.method_14149(world, result.getObject());
+                    //user.inventory.offofferOrDrop(result.getObject());
+                if (result.getActionResult().equals(ActionResult.SUCCESS)) { // CONSUME
                     stack.setCount(stack.getCount() - 1);
                 }
             }
@@ -247,67 +262,93 @@ public class StorageBoxItem extends Item {
             }
 
             if (stack.getCount() <= 0) {
-                removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
-                removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+                removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+                removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+                removeItemDataAsInt(storageBoxStack, KEY_AUTO);
 
             } else {
                 setItemStackSize(storageBoxStack, countInBox);
                 setItemStack(storageBoxStack, stack);
             }
-            return canUse ? TypedActionResult.success(storageBoxStack) : TypedActionResult.pass(storageBoxStack);
+            return canUse ? new TypedActionResult<>(ActionResult.SUCCESS, storageBoxStack) : new TypedActionResult<>(ActionResult.PASS, storageBoxStack);
         }
         if (!world.isClient) {
-            NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory(StorageBoxScreenHandler::new, Text.literal(""));
+
+            NamedScreenHandlerFactory screenHandlerFactory = new NamedScreenHandlerFactory() {
+                @Override
+                public ScreenHandler createScreenHandler(PlayerInventory inventory, PlayerEntity player) {
+                    return new StorageBoxScreenHandler(inventory);
+                }
+
+                @Override
+                public String getId() {
+                    return "storagebox";
+                }
+
+                @Override
+                public String getTranslationKey() {
+                    return "item.storagebox.storagebox";
+                }
+
+                @Override
+                public boolean hasCustomName() {
+                    return false;
+                }
+
+                @Override
+                public Text getName() {
+                    return new LiteralText("");
+                }
+            };
             user.openHandledScreen(screenHandlerFactory);
         }
-        return TypedActionResult.success(storageBoxStack);
+        return new TypedActionResult<>(ActionResult.SUCCESS, storageBoxStack);
     }
 
-    public ItemStack finishUsing(ItemStack storageBoxStack, World world, LivingEntity user) {
+    public ItemStack method_3367(ItemStack storageBoxStack, World world, LivingEntity user) {
         Item item = getItem(storageBoxStack);
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
             stack.setCount(64);
-            ItemStack result = item.finishUsing(stack, world, user);
+            ItemStack result = item.method_3367(stack, world, user);
 
             // ポーション => ガラス瓶などのサポート
             if (!stack.getItem().equals((result.getItem())))
                 dropItemStack(user, result);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+            setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) - (64 - stack.getCount()));
         }
 
-        return super.finishUsing(storageBoxStack, world, user);
+        return super.method_3367(storageBoxStack, world, user);
     }
 
     @Override
-    public boolean postMine(ItemStack storageBoxStack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
+    public boolean method_3356(ItemStack storageBoxStack, World world, BlockState state, BlockPos pos, LivingEntity miner) {
         Item item = getItem(storageBoxStack);
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
             stack.setCount(64);
-            boolean result = item.postMine(stack, world, state, pos, miner);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+            boolean result = item.method_3356(stack, world, state, pos, miner);
+            setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) - (64 - stack.getCount()));
             return result;
         }
 
-        return super.postMine(storageBoxStack, world, state, pos, miner);
+        return super.method_3356(storageBoxStack, world, state, pos, miner);
     }
 
     @Override
-    public ActionResult useOnEntity(ItemStack storageBoxStack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        ActionResult result;
+    public boolean method_3353(ItemStack storageBoxStack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        boolean result;
         Item item = getItem(storageBoxStack);
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
             stack.setCount(64);
-            result = item.useOnEntity(stack, user, entity, hand);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+            result = item.method_3353(stack, user, entity, hand);
+            setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) - (64 - stack.getCount()));
         } else {
-            result = super.useOnEntity(storageBoxStack, user, entity, hand);
+            result = super.method_3353(storageBoxStack, user, entity, hand);
         }
 
         return result;
@@ -341,30 +382,28 @@ public class StorageBoxItem extends Item {
     }
 
     @Override
-    public void onStoppedUsing(ItemStack storageBoxStack, World world, LivingEntity user, int remainingUseTicks) {
+    public void method_3359(ItemStack storageBoxStack, World world, LivingEntity user, int remainingUseTicks) {
         Item item = getItem(storageBoxStack);
 
         if (item == null) {
-            super.onStoppedUsing(storageBoxStack, world, user, remainingUseTicks);
+            super.method_3359(storageBoxStack, world, user, remainingUseTicks);
             return;
         }
 
         ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
         stack.setCount(64);
-        item.onStoppedUsing(stack, world, user, remainingUseTicks);
-        setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+        item.method_3359(stack, world, user, remainingUseTicks);
+        setItemStackSize(storageBoxStack, getItemDataAsInt(storageBoxStack, KEY_SIZE) - (64 - stack.getCount()));
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity user = context.getPlayer();
-        Hand hand = context.getHand();
+    public ActionResult use(PlayerEntity user, World world, BlockPos pos, Hand hand, Direction direction, float x, float y, float z) {
 
         ItemStack storageBoxStack = user.getStackInHand(hand);
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             boolean canUse = true;
-            int countInBox = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+            int countInBox = getItemDataAsInt(storageBoxStack, KEY_SIZE);
             int itemInBoxCount = countInBox;
             boolean countIsOverMax = false;
             if (countInBox > 64) {
@@ -373,20 +412,19 @@ public class StorageBoxItem extends Item {
                 countInBox -= 64;
             }
             stack.setCount(0);
-            user.setStackInHand(hand, stack);
+            user.equipStack(hand, stack);
             stack.setCount(itemInBoxCount);
 
             ActionResult result;
 
-            BlockHitResult hit = new BlockHitResult(context.getHitPos(), context.getSide(), context.getBlockPos(), context.hitsInsideBlock());
-            result = stack.useOnBlock(new ItemUsageContext(context.getWorld(), context.getPlayer(), context.getHand(), stack, hit));
+            result = stack.use(user, world, pos, hand, direction, x, y, z);
 
             if (result != ActionResult.SUCCESS) {
                 canUse = false;
             }
 
             storageBoxStack.setCount(0);
-            user.setStackInHand(hand, storageBoxStack);
+            user.equipStack(hand, storageBoxStack);
             storageBoxStack.setCount(1);
 
             /*
@@ -402,28 +440,28 @@ public class StorageBoxItem extends Item {
             }
 
             if (stack.getCount() <= 0) {
-                removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
-                removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+                removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+                removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+                removeItemDataAsInt(storageBoxStack, KEY_AUTO);
             } else {
                 setItemStackSize(storageBoxStack, countInBox);
                 setItemStack(storageBoxStack, stack);
             }
             return canUse ? ActionResult.SUCCESS : ActionResult.PASS;
         }
-        return super.useOnBlock(context);
+        return super.use(user, world, pos, hand, direction, x, y, z);
     }
 
     // 0 = 取り出し(インベントリオープン時はコンテナーへ収納) 1 = 取り出してドロップ 2 = ストレージボックスへ収納(インベントリオープン時はコンテナーからストレージボックスへ収納) 3 = AutoCollect切り替え
     public static void keyboardEvent(int type, PlayerEntity player, ItemStack storageBoxStack) {
         if (type == 0) {
-            if (player.currentScreenHandler != null && !(player.currentScreenHandler instanceof PlayerScreenHandler) && !(player.currentScreenHandler.slots.size() <= 0)) {
+            if (player.openScreenHandler != null && !(player.openScreenHandler instanceof PlayerScreenHandler) && !(player.openScreenHandler.slots.size() <= 0)) {
                 // コンテナー
                 if (hasStackInStorageBox(storageBoxStack)) {
                     ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
-                    int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                    for (Slot slot : player.currentScreenHandler.slots) {
-                        if (slot.inventory == player.getInventory()) continue;
+                    int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
+                    for (Slot slot : player.openScreenHandler.slots) {
+                        if (slot.inventory == player.inventory) continue;
                         ItemStack stack = slot.getStack();
                         if (!stack.isEmpty()) continue;
                         ItemStack newStack = itemInBox.copy();
@@ -436,9 +474,9 @@ public class StorageBoxItem extends Item {
                         } else {
                             newStack.setCount(count);
                             slot.setStack(newStack);
-                            removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                            removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
-                            removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+                            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+                            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+                            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
                             break;
                         }
                     }
@@ -448,26 +486,26 @@ public class StorageBoxItem extends Item {
             }
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
-                int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+                int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
                 ItemStack giveStack = itemInBox.copy();
                 if (count > 64) {
                     giveStack.setCount(64);
-                    if (canGive(player.getInventory().main)) {
-                        player.giveItemStack(giveStack);
+                    if (canGive(player.inventory.field_15082)) { // field_15082 = main
+                        player.inventory.insertStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
                     }
                     setItemStackSize(storageBoxStack, count - 64);
                 } else {
                     giveStack.setCount(count);
-                    if (canGive(player.getInventory().main)) {
-                        player.giveItemStack(giveStack);
+                    if (canGive(player.inventory.field_15082)) {
+                        player.inventory.insertStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
                     }
-                    removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                    removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
-                    removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+                    removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+                    removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+                    removeItemDataAsInt(storageBoxStack, KEY_AUTO);
                 }
                 return;
             }
@@ -475,7 +513,7 @@ public class StorageBoxItem extends Item {
         if (type == 1) {
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
-                int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+                int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
                 ItemStack dropStack = itemInBox.copy();
                 if (count > 64) {
                     dropStack.setCount(64);
@@ -484,25 +522,25 @@ public class StorageBoxItem extends Item {
                 } else {
                     dropStack.setCount(count);
                     player.dropItem(dropStack, false);
-                    removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                    removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
-                    removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+                    removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+                    removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+                    removeItemDataAsInt(storageBoxStack, KEY_AUTO);
                 }
                 return;
             }
         }
         if (type == 2) {
             if (hasStackInStorageBox(storageBoxStack)) {
-                if (!(player.currentScreenHandler instanceof PlayerScreenHandler) && player.currentScreenHandler != null) {
+                if (!(player.openScreenHandler instanceof PlayerScreenHandler) && player.openScreenHandler != null) {
                     ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
-                    int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                    for (Slot slot : player.currentScreenHandler.slots) {
-                        if (slot.inventory == player.getInventory()) continue;
+                    int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
+                    for (Slot slot : player.openScreenHandler.slots) {
+                        if (slot.inventory == player.inventory) continue;
                         ItemStack stack = slot.getStack();
                         if (stack.getItem() == itemInBox.getItem()) {
                             if (!canInsertStack(stack, storageBoxStack)) continue;
                             count += stack.getCount();
-                            player.getInventory().removeOne(stack);
+                            player.inventory.method_13257(stack); // method_13257 = removeOne
                             stack.setCount(0);
                             stack = ItemStack.EMPTY;
                             slot.setStack(stack);
@@ -514,12 +552,12 @@ public class StorageBoxItem extends Item {
             }
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
-                int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                for (ItemStack stack : player.getInventory().main) {
+                int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
+                for (ItemStack stack : player.inventory.field_15082) {
                     if (stack.getItem() == itemInBox.getItem()) {
                         if (!canInsertStack(stack, storageBoxStack)) continue;
                         count += stack.getCount();
-                        player.getInventory().removeOne(stack);
+                        player.inventory.method_13257(stack);
                         stack.setCount(0);
                     }
                 }
@@ -530,28 +568,28 @@ public class StorageBoxItem extends Item {
         if (type == 3) {
             if (isAutoCollect(storageBoxStack)) {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(Text.literal("§7[StorageBox] §cAutoCollect changed OFF"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §cAutoCollect changed OFF"), false);
             } else {
                 changeAutoCollect(storageBoxStack);
-                player.sendMessage(Text.literal("§7[StorageBox] §aAutoCollect changed ON"), false);
+                player.sendMessage(new LiteralText("§7[StorageBox] §aAutoCollect changed ON"), false);
             }
         }
     }
 
     @Override
-    public void appendTooltip(ItemStack storageBoxStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(storageBoxStack, context, tooltip, type);
+    public void appendTooltips(ItemStack storageBoxStack, @Nullable World world, List<String> tooltip, TooltipContext tooltipContext) {
+        super.appendTooltips(storageBoxStack, world, tooltip, tooltipContext);
         if (hasStackInStorageBox(storageBoxStack)) {
             Item item = getItem(storageBoxStack);
             ItemStack stack = getStackInStorageBox(storageBoxStack);
-            int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-            tooltip.add(Text.literal("§7Name: " + stack.getItem().getName().getString()));
-            tooltip.add(Text.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
-            tooltip.add(Text.literal("§7Items: " + count));
-            tooltip.add(Text.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
-            tooltip.add(Text.literal("§7[Information]"));
+            int count = getItemDataAsInt(storageBoxStack, KEY_SIZE);
+            tooltip.add("§7Name: " + stack.getCustomName());
+            tooltip.add("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount()));
+            tooltip.add("§7Items: " + count);
+            tooltip.add("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF"));
+            tooltip.add("§7[Information]");
             if (item != null)
-                item.appendTooltip(stack, context, tooltip, type);
+                item.appendTooltips(stack, world, tooltip, tooltipContext);
         }
     }
 
@@ -607,11 +645,11 @@ public class StorageBoxItem extends Item {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
-        if (!stack.getComponents().isEmpty()) {
+        if (stack.hasNbt()) {
             ItemStack stackInBox = getStackInStorageBox(storageBoxStack);
             if (stackInBox == null || stackInBox.isEmpty()) return false;
-            if (stackInBox.getComponents().isEmpty()) return false;
-            if (!stackInBox.equals(stack) && !stackInBox.getComponents().equals(stack.getComponents())) return false;
+            if (!stackInBox.hasNbt()) return false;
+            if (!stackInBox.getNbt().equals(stack.getNbt())) return false;
         }
         return true;
     }

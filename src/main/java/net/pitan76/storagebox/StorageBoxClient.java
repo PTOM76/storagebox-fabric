@@ -6,6 +6,9 @@ import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.legacyfabric.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.legacyfabric.fabric.api.networking.v1.PacketByteBufs;
 import net.legacyfabric.fabric.api.registry.v1.RegistryHelper;
+import net.legacyfabric.fabric.api.registry.v1.RegistryIds;
+import net.legacyfabric.fabric.api.resource.ItemModelRegistry;
+import net.legacyfabric.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.Window;
@@ -26,6 +29,10 @@ public class StorageBoxClient implements ClientModInitializer {
                 Keyboard.KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
+
+        ItemModelRegistry.registerItemModel(StorageBoxItem.instance, StorageBoxMod.id("storagebox"));
+
+
 
         //.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
 

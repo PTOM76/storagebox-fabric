@@ -1,5 +1,15 @@
 package net.pitan76.storagebox.mixin;
 
+import net.minecraft.block.ShulkerBoxBlock;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.type.ContainerComponent;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.item.BlockItem;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.pitan76.storagebox.DataComponentTypes;
 import net.pitan76.storagebox.ModConfig;
 import net.pitan76.storagebox.StorageBoxItem;
@@ -35,8 +45,8 @@ public class ItemPickupMixin {
 
         Boolean supportSimpleBackpack = ModConfig.getBoolean("SupportSimpleBackpack");
         if (supportSimpleBackpack == null) supportSimpleBackpack = true;
-        // SimpleBackpackのサポート
         /*
+        // SimpleBackpackのサポート
         if (supportSimpleBackpack && Registries.ITEM.getId(stack.getItem()).equals(new Identifier("simple_backpack", "backpack"))) {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
@@ -58,19 +68,18 @@ public class ItemPickupMixin {
                 }
             }
         }
-
-         */
+        */
 
         Boolean supportShulkerBox = ModConfig.getBoolean("SupportShulkerBox");
         if (supportShulkerBox == null) supportShulkerBox = true;
         // シュルカーボックスのサポート
-        /*
         if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
-            NbtCompound nbt = stack.getNbt();
-            if (nbt.contains("BlockEntityTag")) {
-                NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
+            ComponentMap components = stack.getComponents();
+
+            if (components.contains(net.minecraft.component.DataComponentTypes.CONTAINER)) {
+                ContainerComponent component = components.get(net.minecraft.component.DataComponentTypes.CONTAINER);
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(ShulkerBoxBlockEntity.INVENTORY_SIZE, ItemStack.EMPTY);
-                Inventories.readNbt(tileNbt, items);
+                component.copyTo(items);
 
                 int i;
                 for (i = 0; i < items.size(); i++) {
@@ -78,16 +87,14 @@ public class ItemPickupMixin {
                     if (process(inStack, pickupStack)) {
                         // シュルカーボックス内のストレージボックスのNBTを更新
                         items.set(i, inStack);
-                        Inventories.writeNbt(tileNbt, items);
-                        nbt.put("BlockEntityTag", tileNbt);
-                        stack.setNbt(nbt);
+                        stack.set(net.minecraft.component.DataComponentTypes.CONTAINER, ContainerComponent.fromStacks(items));
                         return true;
                     }
                 }
             }
         }
 
-         */
+
         return false;
     }
 

@@ -1,5 +1,6 @@
 package net.pitan76.storagebox.mixin;
 
+import net.minecraft.item.ModelTransformationMode;
 import net.pitan76.storagebox.ItemRendererHooks;
 import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.client.MinecraftClient;
@@ -7,7 +8,6 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.item.ItemStack;
@@ -34,7 +34,7 @@ public abstract class RenderStorageBoxMixin {
 
     private static final ThreadLocal<ItemStack> RENDER_ITEM_OVERRIDING_FOR = new ThreadLocal<>();
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/render/model/json/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/item/ModelTransformationMode;ZLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;IILnet/minecraft/client/render/model/BakedModel;)V", at = @At("HEAD"), cancellable = true)
     protected void renderItem(ItemStack stack, ModelTransformationMode renderMode, boolean leftHanded, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, BakedModel model, CallbackInfo ci) {
         if (RENDER_ITEM_OVERRIDING_FOR.get() == stack) return;
         if (!(stack.getItem() instanceof StorageBoxItem)) return;
@@ -44,8 +44,8 @@ public abstract class RenderStorageBoxMixin {
         if (!hasStackInStorageBox(stack)) return;
         ItemStack renderStack = getStackInStorageBox(stack).copy();
         renderStack.setCount(1);
-        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
-                .getModel(renderStack);
+        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer()
+                .getModel(renderStack, MinecraftClient.getInstance().player, renderMode);
         RENDER_ITEM_OVERRIDING_FOR.set(stack);
         try {
             this.renderItem(renderStack, renderMode, leftHanded, matrices, vertexConsumers, light, overlay, realModel);

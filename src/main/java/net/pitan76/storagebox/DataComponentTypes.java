@@ -13,8 +13,8 @@ public class DataComponentTypes {
     public static ComponentType<ItemStack> ITEM_DATA;
 
     public static void init() {
-        ITEM_COUNT = Registry.register(Registries.DATA_COMPONENT_TYPE, StorageBoxMod.id("size"), ComponentType.<Integer>builder().codec(Codecs.NONNEGATIVE_INT).packetCodec(PacketCodecs.VAR_INT).build());
-        AUTO_COLLECT = Registry.register(Registries.DATA_COMPONENT_TYPE, StorageBoxMod.id("auto"), ComponentType.<Integer>builder().codec(Codecs.NONNEGATIVE_INT).packetCodec(PacketCodecs.VAR_INT).build());
+        ITEM_COUNT = Registry.register(Registries.DATA_COMPONENT_TYPE, StorageBoxMod.id("size"), ComponentType.<Integer>builder().codec(Codecs.NON_NEGATIVE_INT).packetCodec(PacketCodecs.VAR_INT).build());
+        AUTO_COLLECT = Registry.register(Registries.DATA_COMPONENT_TYPE, StorageBoxMod.id("auto"), ComponentType.<Integer>builder().codec(Codecs.NON_NEGATIVE_INT).packetCodec(PacketCodecs.VAR_INT).build());
         ITEM_DATA = Registry.register(Registries.DATA_COMPONENT_TYPE, StorageBoxMod.id("item_data"), ComponentType.<ItemStack>builder().codec(ItemStack.CODEC).packetCodec(ItemStack.PACKET_CODEC).build());
     }
 }

@@ -1,5 +1,6 @@
 package net.pitan76.storagebox;
 
+import net.minecraft.item.ModelTransformationMode;
 import net.pitan76.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
@@ -25,8 +26,8 @@ public class ItemRendererHooks {
         if (renderStack.isEmpty()) return false;
 
         renderStack.setCount(1);
-        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer().getModels()
-                .getModel(renderStack);
+        BakedModel realModel = MinecraftClient.getInstance().getItemRenderer()
+                .getModel(renderStack, MinecraftClient.getInstance().player, ModelTransformationMode.GUI);
         OVERRIDING_FOR.set(stack);
         try {
             ((ItemRendererAccessor) renderer).invokeRenderBakedItemModel(realModel, renderStack, light, overlay, matrices, vertices);

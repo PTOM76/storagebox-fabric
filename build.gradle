@@ -85,7 +85,7 @@ processResources {
 	}
 }
 
-def targetJavaVersion = 8
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
 	// ensure that the encoding is set to UTF-8, no matter what the system default is
 	// this fixes some edge cases with special characters not displaying correctly
@@ -94,14 +94,14 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 	it.options.release = targetJavaVersion
 
-	options.release = 8
+	options.release = 21
 }
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = "UTF-8"
-	options.release = 8
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
+	options.release = 21
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 java {

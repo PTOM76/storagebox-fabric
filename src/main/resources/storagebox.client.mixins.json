@@ -5,12 +5,9 @@
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "KeyBindingAccessor",
-    "RenderStorageBoxMixin"
+    "ItemModelManagerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "client": [
-    "ItemModelManagerMixin"
-  ]
+  }
 }

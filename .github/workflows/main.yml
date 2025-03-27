@@ -1,9 +1,6 @@
 # Build and Publish
 name: Gradle CI
 on: [push, pull_request]
-permissions:
-  contents: read
-  packages: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,6 +42,5 @@ jobs:
         run: chmod +x ./gradlew
       - name: Publish to GitHub Packages
         env:
-          GITHUB_ACTOR: PTOM76
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew assemble publish

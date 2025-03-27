@@ -94,7 +94,6 @@ public class ItemPickupMixin {
             }
         }
 
-
         return false;
     }
 
@@ -114,7 +113,7 @@ public class ItemPickupMixin {
                 boolean insertedBox = false;
                 boolean checkedEnderChest = false;
                 // インベントリ
-                for (ItemStack inStack : player.getInventory().main) {
+                for (ItemStack inStack : player.getInventory().getMainStacks()) {
 
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == Items.ENDER_CHEST && !checkedEnderChest) {

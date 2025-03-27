@@ -3,6 +3,7 @@ package net.pitan76.storagebox;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -23,7 +24,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class StorageBoxItem extends Item {
     /*
@@ -415,7 +416,7 @@ public class StorageBoxItem extends Item {
                 ItemStack giveStack = itemInBox.copy();
                 if (count > 64) {
                     giveStack.setCount(64);
-                    if (canGive(player.getInventory().main)) {
+                    if (canGive(player.getInventory().getMainStacks())) {
                         player.giveItemStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
@@ -423,7 +424,7 @@ public class StorageBoxItem extends Item {
                     setItemStackSize(storageBoxStack, count - 64);
                 } else {
                     giveStack.setCount(count);
-                    if (canGive(player.getInventory().main)) {
+                    if (canGive(player.getInventory().getMainStacks())) {
                         player.giveItemStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
@@ -478,7 +479,7 @@ public class StorageBoxItem extends Item {
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                 int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-                for (ItemStack stack : player.getInventory().main) {
+                for (ItemStack stack : player.getInventory().getMainStacks()) {
                     if (stack.getItem() == itemInBox.getItem()) {
                         if (!canInsertStack(stack, storageBoxStack)) continue;
                         count += stack.getCount();
@@ -502,19 +503,19 @@ public class StorageBoxItem extends Item {
     }
 
     @Override
-    public void appendTooltip(ItemStack storageBoxStack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        super.appendTooltip(storageBoxStack, context, tooltip, type);
+    public void appendTooltip(ItemStack storageBoxStack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+        super.appendTooltip(storageBoxStack, context, displayComponent, textConsumer, type);
         if (hasStackInStorageBox(storageBoxStack)) {
             Item item = getItem(storageBoxStack);
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
-            tooltip.add(Text.literal("§7Name: " + stack.getItem().getName().getString()));
-            tooltip.add(Text.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
-            tooltip.add(Text.literal("§7Items: " + count));
-            tooltip.add(Text.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
-            tooltip.add(Text.literal("§7[Information]"));
+            textConsumer.accept(Text.literal("§7Name: " + stack.getItem().getName().getString()));
+            textConsumer.accept(Text.literal("§7Unit: " + calcItemNumByUnit(count , false, stack.getMaxCount())));
+            textConsumer.accept(Text.literal("§7Items: " + count));
+            textConsumer.accept(Text.literal("§7AutoCollect: " + (isAutoCollect(storageBoxStack) ? "ON" : "OFF")));
+            textConsumer.accept(Text.literal("§7[Information]"));
             if (item != null)
-                item.appendTooltip(stack, context, tooltip, type);
+                item.appendTooltip(stack, context, displayComponent, textConsumer, type);
         }
     }
 

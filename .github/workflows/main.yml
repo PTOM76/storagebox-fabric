@@ -41,4 +41,7 @@ jobs:
       - name: Change gradlew permissions
         run: chmod +x ./gradlew
       - name: Publish to GitHub Packages
+        env:
+          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew assemble publish

@@ -42,5 +42,5 @@ jobs:
         run: chmod +x ./gradlew
       - name: Publish to GitHub Packages
         env:
-          GITHUB_TOKEN: ${{ secrets.GHP_KEY }}
+          GITHUB_TOKEN: ${{ secrets.PAT_KEY }}
         run: ./gradlew assemble publish

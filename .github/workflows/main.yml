@@ -43,6 +43,5 @@ jobs:
         run: chmod +x ./gradlew
       - name: Publish to GitHub Packages
         env:
-          GITHUB_ACTOR: ${{ secrets.GITHUB_ACTOR }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHP_KEY }}
         run: ./gradlew assemble publish

@@ -1,8 +1,9 @@
 package net.pitan76.storagebox;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -21,7 +22,7 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
     protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
         int x = (this.width - this.backgroundWidth) / 2;
         int y = (this.height - this.backgroundHeight) / 2;
-        context.drawTexture(RenderLayer::getGuiTextured, GUI, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, GUI, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256);
     }
 
     @Override
@@ -29,8 +30,8 @@ public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
         super.drawForeground(context, mouseX, mouseY);
         x = (this.width - this.backgroundWidth) / 2;
         y = (this.height - this.backgroundHeight) / 2;
-        context.drawText(textRenderer, Text.translatable("item.storagebox.storage"), 8, 20, 4210752, false);
-        context.drawText(textRenderer, Text.translatable("item.storagebox.storagebox"), 8, 6, 4210752, false);
+        context.drawText(textRenderer, Text.translatable("item.storagebox.storage"), 8, 20, -12566464, false);
+        context.drawText(textRenderer, Text.translatable("item.storagebox.storagebox"), 8, 6, -12566464, false);
     }
 
     @Override

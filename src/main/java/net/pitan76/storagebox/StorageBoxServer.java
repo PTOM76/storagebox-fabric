@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class StorageBoxServer {
@@ -15,7 +16,8 @@ public class StorageBoxServer {
             ServerPlayNetworking.registerReceiver(handler, KeyPayload.ID, ((payload, context) -> {
                 String str = payload.getData();
                 ServerPlayerEntity player = context.player();
-                player.server.execute(() -> {
+
+                server.execute(() -> {
                             if (context.player().getMainHandStack().getItem() instanceof StorageBoxItem) {
                                 ItemStack itemStack = player.getMainHandStack();
                                 switch (str) {

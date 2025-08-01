@@ -1,22 +1,21 @@
 package net.pitan76.storagebox;
 
+import net.fabricmc.fabric.api.client.render.ColorProviderRegistry;
+import net.fabricmc.fabric.api.client.screen.ScreenProviderRegistry;
+import net.minecraft.client.options.KeyBinding;
+import net.minecraft.util.PacketByteBuf;
 import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.color.item.ItemColorProvider;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.Window;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
 import org.lwjgl.glfw.GLFW;
 
 import static net.pitan76.storagebox.StorageBoxItem.getItem;
@@ -34,7 +33,7 @@ public class StorageBoxClient implements ClientModInitializer {
                 GLFW.GLFW_KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
-        ScreenRegistry.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
+        ScreenProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), StorageBoxScreen.FACTORY);
 
         ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
@@ -62,31 +61,27 @@ public class StorageBoxClient implements ClientModInitializer {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out_and_throw");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_out_and_throw");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         } else {
                             // 取り出す or コンテナーへ一括収納: (: + Shift)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_out");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         }
 
                     } else {
                         if (isKeyDownCtrl()) {
                             // AutoCollect切り替え: (: + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "auto_collect");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("auto_collect");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_in");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_in");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         }
                     }
                 }
@@ -103,8 +98,8 @@ public class StorageBoxClient implements ClientModInitializer {
     private int coolDown = 0;
 
     private boolean isKeyPressed() {
-        final Window mw = MinecraftClient.getInstance().getWindow();
-        if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
+        final Window mw = MinecraftClient.getInstance().window;
+        if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getKeyCode().getKeyCode())) {
             if (coolDown <= 0) {
                 coolDown = 3;
                 return true;
@@ -116,13 +111,13 @@ public class StorageBoxClient implements ClientModInitializer {
     }
 
     private boolean isKeyDownShift() {
-        final Window mw = MinecraftClient.getInstance().getWindow();
+        final Window mw = MinecraftClient.getInstance().window;
         return InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
                 || InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     private boolean isKeyDownCtrl() {
-        final Window mw = MinecraftClient.getInstance().getWindow();
+        final Window mw = MinecraftClient.getInstance().window;
         return InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)
                 || InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL);
     }

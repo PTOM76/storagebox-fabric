@@ -45,7 +45,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			addGameVersion project.minecraft_version
 			relations {
 				requiredDependency "fabric-api"
-				optionalDependency "simple-backpack-fabric"
+				//optionalDependency "simple-backpack-fabric"
 			}
 
 			mainArtifact(tasks.remapJar)

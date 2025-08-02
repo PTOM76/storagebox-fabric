@@ -23,7 +23,7 @@ public class StorageBoxScreen extends HandledScreen {
     }
 
     public StorageBoxScreen(PlayerInventory inventory, Text title) {
-        super(new StorageBoxScreenHandler(inventory, inventory.player));
+        super(new StorageBoxScreenHandler(inventory));
         this.backgroundWidth = 176;
         this.backgroundHeight = 166;
     }

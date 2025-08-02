@@ -40,7 +40,7 @@ public class StorageBoxScreen extends HandledScreen {
         x = (this.width - this.backgroundWidth) / 2;
         y = (this.height - this.backgroundHeight) / 2;
         textRenderer.draw(new TranslatableText("item.storagebox.storage").asFormattedString(), 8, 20, 4210752);
-        textRenderer.draw(new TranslatableText("item.storagebox.name").asFormattedString(), 8, 6, 4210752);
+        textRenderer.draw(new TranslatableText("item.storagebox.storagebox.name").asFormattedString(), 8, 6, 4210752);
     }
 
     @Override

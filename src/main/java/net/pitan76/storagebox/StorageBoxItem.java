@@ -237,7 +237,7 @@ public class StorageBoxItem extends Item {
                 countInBox -= 64;
             }
             stack.setCount(0);
-            user.method_3201(stack, hand);
+            user.method_13617(stack);
             stack.setCount(itemInBoxCount);
 
             TypedActionResult<ItemStack> result;
@@ -248,7 +248,7 @@ public class StorageBoxItem extends Item {
 
             int i = storageBoxStack.getCount();
             storageBoxStack.setCount(0);
-            user.method_3201(storageBoxStack, hand);
+            user.method_13617(storageBoxStack);
             storageBoxStack.setCount(i);
 
 

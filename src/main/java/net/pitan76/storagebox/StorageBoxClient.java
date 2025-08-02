@@ -1,8 +1,10 @@
 package net.pitan76.storagebox;
 
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.render.model.ModelLoader;
 import org.lwjgl.input.Keyboard;
 
 public class StorageBoxClient implements ClientModInitializer {
@@ -16,6 +18,7 @@ public class StorageBoxClient implements ClientModInitializer {
                 Keyboard.KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
+
         //ScreenProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), StorageBoxScreen.FACTORY);
 
 //        ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {

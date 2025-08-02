@@ -4,15 +4,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 public class StorageBoxScreen extends HandledScreen {
-
-//    public static ContainerScreenFactory<StorageBoxScreenHandler> FACTORY = (container) 
-//            -> new StorageBoxScreen(container, MinecraftClient.getInstance().player.inventory, new LiteralText(""));
 
     public static Identifier GUI = StorageBoxMod.id("textures/item/itemselect.png");
 

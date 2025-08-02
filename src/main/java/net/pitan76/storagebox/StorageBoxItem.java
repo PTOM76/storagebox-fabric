@@ -1,15 +1,18 @@
 package net.pitan76.storagebox;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.TooltipContext;
 import net.minecraft.datafixer.fix.ItemIdFix;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.slot.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.itemgroup.ItemGroup;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
@@ -197,7 +200,7 @@ public class StorageBoxItem extends Item {
     public StorageBoxItem() {
         super();
         setMaxCount(1);
-        setTranslationKey("item.storagebox.name");
+        setTranslationKey("storagebox");
         setItemGroup(ItemGroup.MISC);
     }
 
@@ -285,9 +288,10 @@ public class StorageBoxItem extends Item {
             return canUse ? new TypedActionResult<>(ActionResult.SUCCESS, storageBoxStack) : new TypedActionResult<>(ActionResult.PASS, storageBoxStack);
         }
         if (!world.isClient) {
-
-            //NameableContainerFactory screenHandlerFactory = new SimpleNamedContainerFactory(StorageBoxScreenHandler::new, new LiteralText(""));
+            user.openHandledScreen(StorageBoxScreenHandler.FACTORY);
             //ScreenHandler..INSTANCE.openContainer(StorageBoxMod.id("container"), user, (buf) -> {});
+        } else {
+            MinecraftClient.getInstance().setScreen(new StorageBoxScreen(user.inventory, new LiteralText("")));
         }
         return new TypedActionResult<>(ActionResult.SUCCESS, storageBoxStack);
     }

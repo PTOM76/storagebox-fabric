@@ -34,7 +34,6 @@
       "environment": "*"
     }
   ],
-  "accessWidener" : "storagebox.accesswidener",
   "depends": {
     "fabricloader": "*",
     "legacy-fabric-api": "*",

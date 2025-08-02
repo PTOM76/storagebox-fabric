@@ -2,4 +2,5 @@
     "parent": "item/generated",
     "textures": {
         "layer0": "storagebox:item/storagebox"
-    }}
+    }
+}

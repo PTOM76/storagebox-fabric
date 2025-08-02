@@ -5,12 +5,39 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.slot.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 
 public class StorageBoxScreenHandler extends ScreenHandler {
 
-//    public static Screen<ScreenHandler> FACTORY = (syncId, id, player, buf) ->
-//            new StorageBoxScreenHandler(syncId, player.inventory, player);
+    public static NamedScreenHandlerFactory FACTORY = new NamedScreenHandlerFactory() {
+        @Override
+        public ScreenHandler createScreenHandler(PlayerInventory inventory, PlayerEntity player) {
+            return new StorageBoxScreenHandler(inventory, player);
+        }
+
+        @Override
+        public String getId() {
+            return StorageBoxMod.id("container").toString();
+        }
+
+        @Override
+        public String getTranslationKey() {
+            return "item.storagebox.storage";
+        }
+
+        @Override
+        public boolean hasCustomName() {
+            return false;
+        }
+
+        @Override
+        public Text getName() {
+            return new LiteralText("");
+        }
+    };
 
     public static void init() {
         //ContainerProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), FACTORY);

@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
 public abstract class RenderStorageBoxMixin {
-    @Shadow public abstract void renderHeldItem(ItemStack stack, LivingEntity entity, ModelTransformation.Type type, boolean bl);
+    @Shadow public abstract void method_12460(ItemStack itemStack, LivingEntity livingEntity, ModelTransformation.Mode mode, boolean bl);
 
-    @Inject(method = "renderGuiItemModel", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "method_12456", at = @At("HEAD"), cancellable = true)
     private void renderGuiItemModel(ItemStack stack, int x, int y, BakedModel model, CallbackInfo ci) {
         if (ItemRendererHooks.onRenderItemModel((ItemRenderer) (Object) this, stack, x, y, model)) {
             ci.cancel();
@@ -28,18 +28,17 @@ public abstract class RenderStorageBoxMixin {
     @Unique
     private static final ThreadLocal<ItemStack> RENDER_ITEM_OVERRIDING_FOR = new ThreadLocal<>();
 
-    @Inject(method = "renderHeldItem", at = @At("HEAD"), cancellable = true)
-    private void renderHeldItem(ItemStack stack, LivingEntity entity, ModelTransformation.Type type, boolean bl, CallbackInfo ci) {
+    @Inject(method = "method_12460", at = @At("HEAD"), cancellable = true)
+    private void method_12460(ItemStack stack, LivingEntity entity, ModelTransformation.Mode type, boolean bl, CallbackInfo ci) {
         if (RENDER_ITEM_OVERRIDING_FOR.get() == stack) return;
         if (!(stack.getItem() instanceof StorageBoxItem)) return;
-        if (entity == null) return;
         if (!StorageBoxItem.hasStackInStorageBox(stack)) return;
         ItemStack renderStack = StorageBoxItem.getStackInStorageBox(stack).copy();
         renderStack.setCount(1);
 
         RENDER_ITEM_OVERRIDING_FOR.set(stack);
         try {
-            this.renderHeldItem(renderStack, entity, type, bl);
+            this.method_12460(renderStack, entity, type, bl);
         } finally {
             RENDER_ITEM_OVERRIDING_FOR.remove();
         }

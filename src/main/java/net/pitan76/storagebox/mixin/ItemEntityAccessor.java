@@ -12,6 +12,6 @@ public interface ItemEntityAccessor {
     int getPickupDelay();
 
     @Accessor
-    UUID getOwner();
+    String getOwner();
 
 }

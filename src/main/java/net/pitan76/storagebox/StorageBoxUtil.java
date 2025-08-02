@@ -1,5 +1,9 @@
 package net.pitan76.storagebox;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.collection.DefaultedList;
 import org.apache.logging.log4j.Level;
 
 import java.util.HashMap;
@@ -46,4 +50,34 @@ public class StorageBoxUtil {
             this.damage = damage;
         }
     }
+
+    public static void readNbt(NbtCompound tag, DefaultedList<ItemStack> items) {
+        NbtList nbtList = tag.getList("Items", 10); // 10 = CompoundTag
+        items.clear();
+
+        int size = nbtList.size();
+        for (int i = 0; i < size; ++i) {
+            NbtCompound itemNbt = nbtList.getCompound(i);
+            int slot = itemNbt.getByte("Slot") & 255;
+
+            if (slot >= 0 && slot < items.size()) {
+                items.set(slot, new ItemStack(itemNbt));
+            }
+        }
+    }
+
+    public static void writeNbt(NbtCompound tag, DefaultedList<ItemStack> items) {
+        NbtList nbtList = new NbtList();
+        for (int i = 0; i < items.size(); ++i) {
+            ItemStack itemStack = items.get(i);
+            if (!itemStack.isEmpty()) {
+                NbtCompound itemNbt = new NbtCompound();
+                itemNbt.putByte("Slot", (byte) i);
+                itemStack.toNbt(itemNbt);
+                nbtList.add(itemNbt);
+            }
+        }
+        tag.put("Items", nbtList);
+    }
+
 }

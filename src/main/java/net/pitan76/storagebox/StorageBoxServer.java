@@ -1,15 +1,15 @@
 package net.pitan76.storagebox;
 
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.legacyfabric.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.item.ItemStack;
 
 public class StorageBoxServer {
 
     public static void init() {
-        ServerPlayNetworking.registerGlobalReceiver(StorageBoxMod.id("key"), (server, player, handler, buf, responseSender) -> {
-            String str = buf.readString();
+        ServerPlayNetworking.registerGlobalReceiver(StorageBoxMod.lfid("key"), (server, player, handler, buf, responseSender) -> {
+            String str = buf.readString(256);
             if (str.equals("put_out"))
-                server.execute(() -> {
+                server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
@@ -17,7 +17,7 @@ public class StorageBoxServer {
                     }
                 });
             if (str.equals("put_out_and_throw"))
-                server.execute(() -> {
+                server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
@@ -25,7 +25,7 @@ public class StorageBoxServer {
                     }
                 });
             if (str.equals("put_in"))
-                server.execute(() -> {
+                server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
@@ -33,7 +33,7 @@ public class StorageBoxServer {
                     }
                 });
             if (str.equals("auto_collect"))
-                server.execute(() -> {
+                server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem item = (StorageBoxItem) itemStack.getItem();

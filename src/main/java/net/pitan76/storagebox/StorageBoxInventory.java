@@ -1,10 +1,10 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.inventory.BasicInventory;
+import net.minecraft.inventory.SimpleInventory;
 
-public class StorageBoxInventory extends BasicInventory {
+public class StorageBoxInventory extends SimpleInventory {
 
     public StorageBoxInventory() {
-        super(1);
+        super("", false,1);
     }
 }

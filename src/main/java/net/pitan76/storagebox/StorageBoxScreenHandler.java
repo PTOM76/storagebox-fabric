@@ -1,33 +1,28 @@
 package net.pitan76.storagebox;
 
-import net.fabricmc.fabric.api.container.ContainerFactory;
-import net.fabricmc.fabric.api.container.ContainerProviderRegistry;
-import net.minecraft.container.Container;
-import net.minecraft.container.Slot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.slot.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandler;
 
-public class StorageBoxScreenHandler extends Container {
+public class StorageBoxScreenHandler extends ScreenHandler {
 
-    public static ContainerFactory<Container> FACTORY = (syncId, id, player, buf) ->
-            new StorageBoxScreenHandler(syncId, player.inventory, player);
-
-    //public static ContainerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE = new ContainerType<>(StorageBoxScreenHandler::new));
+//    public static Screen<ScreenHandler> FACTORY = (syncId, id, player, buf) ->
+//            new StorageBoxScreenHandler(syncId, player.inventory, player);
 
     public static void init() {
-        ContainerProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), FACTORY);
+        //ContainerProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), FACTORY);
     }
 
     private final Inventory inventory;
 
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        this(syncId, playerInventory);
+    public StorageBoxScreenHandler(PlayerInventory playerInventory, PlayerEntity player) {
+        this(playerInventory);
     }
 
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
-        super(null, syncId);
+    public StorageBoxScreenHandler(PlayerInventory playerInventory) {
         inventory = new StorageBoxInventory();
         int m, l;
 

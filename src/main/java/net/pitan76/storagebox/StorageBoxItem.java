@@ -96,17 +96,18 @@ public class StorageBoxItem extends Item {
         if (nbt.isEmpty()) return null;
 
         // convert 1.12 Item ID
-        if (nbt.contains("Damage", 99)) {
-            String old = nbt.getString("id");
-            int oldDamage = Math.max(0, nbt.getShort("Damage"));
-            String newId = StorageBoxUtil.oldItemIDtoNewItemID(old, oldDamage);
-            if (!old.equals(newId)) {
-                // update item id
-                nbt.putString("id", newId);
-            }
-        }
+//        if (nbt.contains("Damage", 99)) {
+//            String old = nbt.getString("id");
+//            int oldDamage = Math.max(0, nbt.getShort("Damage"));
+//            String newId = StorageBoxUtil.oldItemIDtoNewItemID(old, oldDamage);
+//            if (!old.equals(newId)) {
+//                // update item id
+//                nbt.putString("id", newId);
+//            }
+//        }
         result = new ItemStack(nbt);
         result.setCount(1);
+        //System.out.println("damage in stack: " + result.getDamage() + ", damage in nbt: " + nbt.getInt("Damage"));
 
         return result;
     }
@@ -394,26 +395,23 @@ public class StorageBoxItem extends Item {
                 countInBox -= 64;
             }
             stack.setCount(0);
-            user.method_3201(stack, hand);
+            user.method_13617(stack);
             stack.setCount(itemInBoxCount);
 
-            ActionResult result;
-
-            result = stack.use(user, world, pos, hand, direction, x, y, z);
+            ActionResult result = stack.use(user, world, pos, hand, direction, x, y, z);
 
             if (result != ActionResult.SUCCESS) {
                 canUse = false;
             }
 
             storageBoxStack.setCount(0);
-            user.method_3201(storageBoxStack, hand);
+            user.method_13617(storageBoxStack);
             storageBoxStack.setCount(1);
 
-            /*
-            if (result == ActionResult.SUCCESS || result == ActionResult.CONSUME) {
+
+            if (result == ActionResult.SUCCESS) {
                 stack.decrement(1);
             }
-            */
 
             if (countIsOverMax) {
                 countInBox += stack.getCount();

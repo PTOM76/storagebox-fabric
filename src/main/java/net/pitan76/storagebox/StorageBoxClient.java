@@ -16,6 +16,7 @@ import org.lwjgl.input.Keyboard;
 public class StorageBoxClient implements ClientModInitializer {
 
     private static KeyBinding keyBinding_COLON;
+    private static boolean modelRegistered = false;
 
     @Override
     public void onInitializeClient() {
@@ -24,12 +25,6 @@ public class StorageBoxClient implements ClientModInitializer {
                 Keyboard.KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
-
-        MinecraftClient.getInstance().getItemRenderer().getModels().putModel(
-                StorageBoxItem.instance,
-                0,
-                new ModelIdentifier(StorageBoxMod.MOD_ID, "storagebox")
-        );
 
 //        ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
 //            ItemStack stack = getStackInStorageBox(storageBoxStack);
@@ -48,6 +43,15 @@ public class StorageBoxClient implements ClientModInitializer {
 //        }), StorageBoxItem.instance);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (!modelRegistered && client.getItemRenderer() != null && client.getItemRenderer().getModels() != null) {
+                client.getItemRenderer().getModels().putModel(
+                        StorageBoxItem.instance,
+                        0,
+                        new ModelIdentifier(StorageBoxMod.MOD_ID + ":storagebox", "inventory")
+                );
+                modelRegistered = true;
+            }
+
             if (isKeyPressed()) {
                 PlayerEntity player = client.player;
                 if (player == null) return;

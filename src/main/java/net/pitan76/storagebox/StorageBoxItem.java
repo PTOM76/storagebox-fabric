@@ -197,6 +197,7 @@ public class StorageBoxItem extends Item {
     public StorageBoxItem() {
         super();
         setMaxCount(1);
+        setTranslationKey("item.storagebox.name");
         setItemGroup(ItemGroup.MISC);
     }
 

@@ -4,8 +4,10 @@ import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.legacyfabric.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.legacyfabric.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.fabricmc.api.ClientModInitializer;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.PacketByteBuf;
 import net.pitan76.storagebox.mixin.KeyBindingAccessor;
@@ -23,6 +25,11 @@ public class StorageBoxClient implements ClientModInitializer {
                 "key.storagebox.category"
         ));
 
+        MinecraftClient.getInstance().getItemRenderer().getModels().putModel(
+                StorageBoxItem.instance,
+                0,
+                new ModelIdentifier(StorageBoxMod.MOD_ID, "storagebox")
+        );
 
 //        ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
 //            ItemStack stack = getStackInStorageBox(storageBoxStack);

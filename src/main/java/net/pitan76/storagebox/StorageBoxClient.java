@@ -3,6 +3,7 @@ package net.pitan76.storagebox;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.option.KeyBinding;
 import net.fabricmc.api.ClientModInitializer;
+import org.lwjgl.input.Keyboard;
 
 public class StorageBoxClient implements ClientModInitializer {
 
@@ -12,7 +13,7 @@ public class StorageBoxClient implements ClientModInitializer {
     public void onInitializeClient() {
         keyBinding_COLON = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.storagebox.colon",
-                39, // GLFW.GLFW_KEY_COLON
+                Keyboard.KEY_APOSTROPHE,
                 "key.storagebox.category"
         ));
         //ScreenProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), StorageBoxScreen.FACTORY);

@@ -110,19 +110,19 @@ public class ItemPickupMixin {
                 // インベントリ
                 for (ItemStack inStack : player.inventory.field_15082) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
-//                    if (supportEnderChest && inStack.getItem() == Blocks.ENDERCHEST.item && !checkedEnderChest) {
-//                        for (int i = 0; i < player.getEnderChestInventory().getInvSize(); i++) {
-//                            ItemStack enderChestStack = player.getEnderChestInventory().getInvStack(i);
-//                            if (enderChestStack.hasNbt()) {
-//                                if (process(enderChestStack, itemStack)) {
-//                                    insertedBox = true;
-//                                    itemStack = ItemStack.EMPTY;
-//                                    checkedEnderChest = true;
-//                                    break;
-//                                }
-//                            }
-//                        }
-//                    }
+                    if (supportEnderChest && inStack.getItem() == BlockItem.fromBlock(Blocks.ENDERCHEST) && !checkedEnderChest) {
+                        for (int i = 0; i < player.getEnderChestInventory().getInvSize(); i++) {
+                            ItemStack enderChestStack = player.getEnderChestInventory().getInvStack(i);
+                            if (enderChestStack.hasNbt()) {
+                                if (process(enderChestStack, itemStack)) {
+                                    insertedBox = true;
+                                    itemStack = ItemStack.EMPTY;
+                                    checkedEnderChest = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (inStack.hasNbt()) {
                         if (process(inStack, itemStack)) {
                             insertedBox = true;

@@ -1,24 +1,15 @@
 package net.pitan76.storagebox;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeType;
+import net.minecraft.recipe.Ingredient;
+import net.minecraft.recipe.ShapelessRecipeType;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
-public class AutoCollectRecipe implements RecipeType {
-    private final String group;
-
-    public AutoCollectRecipe(String group) {
-        this.group = group;
-    }
-
-    @Environment(EnvType.CLIENT)
-    @Override
-    public String method_14253() {
-        return group;
+public class AutoCollectRecipe extends ShapelessRecipeType {
+    public AutoCollectRecipe(ItemStack stack) {
+        super("", stack, DefaultedList.ofSize(1, Ingredient.method_14248(stack)));
     }
 
     @Override
@@ -47,20 +38,5 @@ public class AutoCollectRecipe implements RecipeType {
         }
 
         return null;
-    }
-
-    @Environment(EnvType.CLIENT)
-    public boolean method_14250(int width, int height) {
-        return width * height >= 1;
-    }
-
-    @Override
-    public ItemStack getOutput() {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public DefaultedList<ItemStack> method_13670(CraftingInventory inventory) {
-        return DefaultedList.ofSize(1, getResult(inventory));
     }
 }

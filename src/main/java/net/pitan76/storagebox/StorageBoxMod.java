@@ -3,7 +3,11 @@ package net.pitan76.storagebox;
 import net.fabricmc.api.ModInitializer;
 import net.legacyfabric.fabric.api.registry.v2.RegistryHelper;
 import net.legacyfabric.fabric.api.registry.v2.RegistryIds;
+import net.legacyfabric.fabric.impl.registry.RegistryHelperImplementation;
+import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.RecipeDispatcher;
 import net.minecraft.util.Identifier;
+import net.pitan76.storagebox.mc.ExtendRegistryIds;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,9 +21,11 @@ public class StorageBoxMod implements ModInitializer
     @Override
     public void onInitialize() {
         RegistryHelper.register(RegistryIds.ITEMS, lfid("storagebox"), StorageBoxItem.instance);
+
+        RecipeDispatcher.method_14260(id("autocollectrecipes"), new AutoCollectRecipe(new ItemStack(StorageBoxItem.instance, 1, -1)));
+
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();
-        StorageBoxRecipeSerializer.init();
 
         ModConfig.init();
     }

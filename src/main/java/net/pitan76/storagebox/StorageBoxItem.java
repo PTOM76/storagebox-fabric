@@ -249,7 +249,8 @@ public class StorageBoxItem extends Item {
                 return new TypedActionResult<>(result.getActionResult(), storageBoxStack);
             } else if (stack.equalsIgnoreNbt(result.getObject())) {
                 // 食べ物など一定の時間を使って消費するアイテム
-                if (user.method_13054()) {
+                UseAction useAction = stack.getUseAction();
+                if (useAction == UseAction.EAT || useAction == UseAction.DRINK) {
                     user.method_13067();
                     user.method_13050(hand);
                 }

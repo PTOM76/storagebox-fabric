@@ -230,7 +230,7 @@ public class StorageBoxItem extends Item {
                 countInBox -= 64;
             }
             stack.setCount(0);
-            user.method_13617(stack);
+            user.equipStack(hand, stack);
             stack.setCount(itemInBoxCount);
 
             TypedActionResult<ItemStack> result;
@@ -241,13 +241,13 @@ public class StorageBoxItem extends Item {
 
             int i = storageBoxStack.getCount();
             storageBoxStack.setCount(0);
-            user.method_13617(storageBoxStack);
+            user.equipStack(hand, storageBoxStack);
             storageBoxStack.setCount(i);
 
 
             if (result.getActionResult() == ActionResult.FAIL) {
                 return new TypedActionResult<>(result.getActionResult(), storageBoxStack);
-            } else if (stack.getItem().equals(result.getObject().getItem())) {
+            } else if (stack.equalsIgnoreNbt(result.getObject())) {
                 // 食べ物など一定の時間を使って消費するアイテム
                 if (user.method_13054()) {
                     user.method_13067();
@@ -394,8 +394,9 @@ public class StorageBoxItem extends Item {
                 itemInBoxCount = 64;
                 countInBox -= 64;
             }
+
             stack.setCount(0);
-            user.method_13617(stack);
+            user.equipStack(hand, stack);
             stack.setCount(itemInBoxCount);
 
             ActionResult result = stack.use(user, world, pos, hand, direction, x, y, z);
@@ -405,13 +406,13 @@ public class StorageBoxItem extends Item {
             }
 
             storageBoxStack.setCount(0);
-            user.method_13617(storageBoxStack);
+            user.equipStack(hand, storageBoxStack);
             storageBoxStack.setCount(1);
 
 
-            if (result == ActionResult.SUCCESS) {
-                stack.decrement(1);
-            }
+//            if (result == ActionResult.SUCCESS) {
+//                stack.decrement(1);
+//            }
 
             if (countIsOverMax) {
                 countInBox += stack.getCount();

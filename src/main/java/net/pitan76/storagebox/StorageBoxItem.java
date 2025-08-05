@@ -211,9 +211,11 @@ public class StorageBoxItem extends Item {
         if (entity instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) entity;
             player.dropItem(itemstack.copy(), false);
-            itemstack.setCount(0);
+            itemstack.count = 0;
         }
     }
+
+    use
 
     @Override
     public TypedActionResult<ItemStack> method_13649(World world, PlayerEntity user, Hand hand) {

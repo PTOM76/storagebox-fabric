@@ -20,7 +20,7 @@ public class StorageBoxMod implements ModInitializer
     public void onInitialize() {
         RegistryHelper.register(RegistryIds.ITEMS, lfid("storagebox"), StorageBoxItem.instance);
 
-        RecipeDispatcher.method_14260(id("autocollectrecipes"), new AutoCollectRecipe(new ItemStack(StorageBoxItem.instance, 1, -1)));
+        RecipeDispatcher.getInstance().addRecipeType(new AutoCollectRecipe(new ItemStack(StorageBoxItem.instance, 1, -1)));
 
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();

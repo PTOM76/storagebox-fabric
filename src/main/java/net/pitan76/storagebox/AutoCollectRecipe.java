@@ -2,14 +2,14 @@ package net.pitan76.storagebox;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.ShapelessRecipeType;
-import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+
+import java.util.Collections;
 
 public class AutoCollectRecipe extends ShapelessRecipeType {
     public AutoCollectRecipe(ItemStack stack) {
-        super("", stack, DefaultedList.ofSize(1, Ingredient.method_14248(stack)));
+        super(stack, Collections.singletonList(stack));
     }
 
     @Override
@@ -18,7 +18,7 @@ public class AutoCollectRecipe extends ShapelessRecipeType {
 
         for (int i = 0; i < inventory.getInvSize(); ++i) {
             ItemStack stack = inventory.getInvStack(i);
-            if (stack.isEmpty()) continue;
+            if (stack == null) continue;
             ++count;
             if (!(stack.getItem() instanceof StorageBoxItem)) return false;
         }
@@ -29,7 +29,7 @@ public class AutoCollectRecipe extends ShapelessRecipeType {
     public ItemStack getResult(CraftingInventory inventory) {
         for (int i = 0; i < inventory.getInvSize(); ++i) {
             ItemStack stack = inventory.getInvStack(i);
-            if (stack.isEmpty()) continue;
+            if (stack == null) continue;
             if (!(stack.getItem() instanceof StorageBoxItem)) continue;
 
             ItemStack crafted = stack.copy();

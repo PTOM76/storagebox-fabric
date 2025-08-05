@@ -10,6 +10,7 @@ public class StorageBoxServer {
             String str = buf.readString(256);
             if (str.equals("put_out"))
                 server.submit(() -> {
+                    if (player.getMainHandStack() == null) return;
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem.keyboardEvent(0, player, itemStack);
@@ -17,6 +18,7 @@ public class StorageBoxServer {
                 });
             if (str.equals("put_out_and_throw"))
                 server.submit(() -> {
+                    if (player.getMainHandStack() == null) return;
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem.keyboardEvent(1, player, itemStack);
@@ -24,6 +26,7 @@ public class StorageBoxServer {
                 });
             if (str.equals("put_in"))
                 server.submit(() -> {
+                    if (player.getMainHandStack() == null) return;
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem.keyboardEvent(2, player, itemStack);
@@ -31,6 +34,7 @@ public class StorageBoxServer {
                 });
             if (str.equals("auto_collect"))
                 server.submit(() -> {
+                    if (player.getMainHandStack() == null) return;
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
                         StorageBoxItem.keyboardEvent(3, player, itemStack);

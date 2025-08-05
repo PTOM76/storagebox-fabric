@@ -9,7 +9,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.pitan76.storagebox.StorageBoxUtil;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,6 +50,7 @@ public class ItemPickupMixin {
                 int i;
                 for (i = 0; i < items.size(); i++) {
                     ItemStack inStack = items.get(i);
+                    if (inStack == null) return false;
                     if (process(inStack, pickupStack)) {
                         // バックパック内のストレージボックスのNBTを更新
                         items.set(i, inStack);
@@ -82,6 +82,8 @@ public class ItemPickupMixin {
                 boolean checkedEnderChest = false;
                 // インベントリ
                 for (ItemStack inStack : player.inventory.main) {
+                    if (inStack == null) continue;
+
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == BlockItem.fromBlock(Blocks.ENDERCHEST) && !checkedEnderChest) {
                         for (int i = 0; i < player.getEnderChestInventory().getInvSize(); i++) {

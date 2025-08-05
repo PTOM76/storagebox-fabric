@@ -3,8 +3,8 @@ package net.pitan76.storagebox;
 import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.legacyfabric.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.legacyfabric.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.legacyfabric.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.legacyfabric.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.util.ModelIdentifier;
@@ -22,25 +22,9 @@ public class StorageBoxClient implements ClientModInitializer {
     public void onInitializeClient() {
         keyBinding_COLON = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.storagebox.colon",
-                Keyboard.KEY_APOSTROPHE,
+                Keyboard.KEY_SEMICOLON,
                 "key.storagebox.category"
         ));
-
-//        ColorProviderRegistry.ITEM.register(((storageBoxStack, tintIndex) -> {
-//            ItemStack stack = getStackInStorageBox(storageBoxStack);
-//            if (stack == null || stack.isEmpty()) return -1;
-//            if (stack.getItem() instanceof ItemColorProvider) {
-//                ItemColorProvider provider = (ItemColorProvider) getItem(stack);
-//                return provider.getColor(stack, tintIndex);
-//            }
-//
-//            try {
-//                return ColorProviderRegistry.ITEM.get(stack.getItem()).getColor(stack, tintIndex);
-//            } catch (NullPointerException e) {
-//                return -1;
-//            }
-//
-//        }), StorageBoxItem.instance);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!modelRegistered && client.getItemRenderer() != null && client.getItemRenderer().getModels() != null) {
@@ -86,13 +70,20 @@ public class StorageBoxClient implements ClientModInitializer {
                     }
                 }
             }
-            if (client.player != null) {
-                PlayerEntity player = client.player;
-                if (player.getMainHandStack().getItem() instanceof StorageBoxItem)
-                    StorageBoxItem.showBar(player, player.getMainHandStack());
-            }
-            coolDown--;
+            if (coolDown > 0)
+                coolDown--;
         });
+
+        HudRenderCallback.EVENT.register((client, delta) -> {
+            if (client.player == null) return;
+            PlayerEntity player = client.player;
+            if (player.getMainHandStack() == null) return;
+
+            if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
+                StorageBoxItem.showBar(player.getMainHandStack());
+            }
+        });
+
     }
 
     private int coolDown = 0;

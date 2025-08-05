@@ -3,7 +3,7 @@ package net.pitan76.storagebox;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.slot.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 
 import static net.pitan76.storagebox.StorageBoxItem.*;
 
@@ -25,7 +25,7 @@ public class StorageBoxSlot extends Slot {
     @Override
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
-        if (itemStack == null || itemStack.count == 0) {
+        if (itemStack == null || itemStack.stackSize == 0) {
             ItemStack storageBoxStack = player.getMainHandStack();
             removeItemDataAsInt(storageBoxStack, KEY_SIZE);
             removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
@@ -35,7 +35,7 @@ public class StorageBoxSlot extends Slot {
         }
         ItemStack storageBoxStack = player.getMainHandStack();
         setItemStack(storageBoxStack, itemStack.copy());
-        setItemStackSize(storageBoxStack, itemStack.count);
+        setItemStackSize(storageBoxStack, itemStack.stackSize);
     }
 
     @Override

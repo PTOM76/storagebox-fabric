@@ -4,7 +4,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.slot.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.LiteralText;
@@ -84,7 +84,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
                 return null;
             }
 
-            if (originalStack.count == 0) {
+            if (originalStack.stackSize == 0) {
                 slot.setStack(null);
             } else {
                 slot.markDirty();

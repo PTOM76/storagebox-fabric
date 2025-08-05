@@ -3,7 +3,7 @@ package net.pitan76.storagebox;
 import net.fabricmc.api.ModInitializer;
 import net.legacyfabric.fabric.api.registry.v2.RegistryHelper;
 import net.legacyfabric.fabric.api.registry.v2.RegistryIds;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.recipe.RecipeDispatcher;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.Level;

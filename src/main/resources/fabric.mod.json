@@ -37,6 +37,6 @@
   "depends": {
     "fabricloader": "*",
     "legacy-fabric-api": "*",
-    "minecraft": ">=1.8.9"
+    "minecraft": ">=b1.7.3"
   }
 }

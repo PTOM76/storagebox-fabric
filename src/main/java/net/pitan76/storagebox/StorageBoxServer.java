@@ -1,7 +1,7 @@
 package net.pitan76.storagebox;
 
 import net.legacyfabric.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 
 public class StorageBoxServer {
 

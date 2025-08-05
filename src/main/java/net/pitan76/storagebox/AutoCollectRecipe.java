@@ -1,7 +1,7 @@
 package net.pitan76.storagebox;
 
 import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.recipe.ShapelessRecipeType;
 import net.minecraft.world.World;
 

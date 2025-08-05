@@ -4,7 +4,7 @@ import net.pitan76.storagebox.mixin.ItemRendererAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 
 import static net.pitan76.storagebox.StorageBoxItem.*;
 
@@ -21,7 +21,7 @@ public class ItemRendererHooks {
         if (!hasStackInStorageBox(stack)) return false;
         ItemStack renderStack = getStackInStorageBox(stack).copy();
 
-        renderStack.count = 1;
+        renderStack.stackSize = 1;
         OVERRIDING_FOR.set(stack);
         try {
             ((ItemRendererAccessor) renderer).invokeRenderGuiItemModel(renderStack, x, y);

@@ -1,6 +1,6 @@
 package net.pitan76.storagebox.api;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.pitan76.storagebox.StorageBoxItem;
 

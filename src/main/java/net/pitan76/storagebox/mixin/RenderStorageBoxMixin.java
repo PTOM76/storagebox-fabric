@@ -5,7 +5,7 @@ import net.minecraft.entity.LivingEntity;
 import net.pitan76.storagebox.ItemRendererHooks;
 import net.pitan76.storagebox.StorageBoxItem;
 import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.core.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -36,7 +36,7 @@ public abstract class RenderStorageBoxMixin {
         if (!(stack.getItem() instanceof StorageBoxItem)) return;
         if (!StorageBoxItem.hasStackInStorageBox(stack)) return;
         ItemStack renderStack = StorageBoxItem.getStackInStorageBox(stack).copy();
-        renderStack.count = 1;
+        renderStack.stackSize = 1;
 
         RENDER_ITEM_OVERRIDING_FOR.set(stack);
         try {
@@ -57,7 +57,7 @@ public abstract class RenderStorageBoxMixin {
         if (!(stack.getItem() instanceof StorageBoxItem)) return;
         if (!StorageBoxItem.hasStackInStorageBox(stack)) return;
         ItemStack renderStack = StorageBoxItem.getStackInStorageBox(stack).copy();
-        renderStack.count = 1;
+        renderStack.stackSize = 1;
 
         RENDER_ITEM2_OVERRIDING_FOR.set(stack);
         try {

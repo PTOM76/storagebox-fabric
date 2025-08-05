@@ -1,6 +1,7 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 plugins {
-	id 'fabric-loom' version '1.11-SNAPSHOT'
-	id 'legacy-looming' version '1.11-SNAPSHOT'
+	id("fabric-loom") version "1.10.0-bta"
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.+'
 	id "com.modrinth.minotaur" version "2.+"
@@ -10,25 +11,127 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
+def lwjglVersion = "3.3.4"
+
+def lwjglNatives
+if (Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC)) {
+	lwjglNatives = "natives-linux"
+} else if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+	lwjglNatives = "natives-windows"
+} else if (Os.isFamily(Os.FAMILY_MAC)) {
+	lwjglNatives = "natives-macos" + (Os.isArch("aarch64") ? "-arm64" : "")
+} else {
+	throw new GradleException("Unsupported OS")
 }
 
+
+loom {
+	noIntermediateMappings()
+	customMinecraftMetadata.set("https://downloads.betterthanadventure.net/bta-client/$bta_channel/v$bta_version/manifest.json")
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url = uri("https://jitpack.io")
+	}
+	maven {
+		name = "Babric"
+		url = uri("https://maven.glass-launcher.net/babric")
+	}
+	maven {
+		name = "Fabric"
+		url = uri("https://maven.fabricmc.net/")
+	}
+	maven {
+		name = "SignalumMavenInfrastructure"
+		url = uri("https://maven.thesignalumproject.net/infrastructure")
+	}
+	maven {
+		name = "SignalumMavenReleases"
+		url = uri("https://maven.thesignalumproject.net/releases")
+	}
+	ivy {
+		url = uri("https://github.com/Better-than-Adventure")
+		patternLayout {
+			artifact "[organisation]/releases/download/v[revision]/[module].jar"
+		}
+		metadataSources {
+			artifact()
+		}
+	}
+	ivy {
+		url = uri("https://downloads.betterthanadventure.net/bta-client/${bta_channel}/")
+		patternLayout {
+			artifact "/v[revision]/client.jar"
+		}
+		metadataSources {
+			artifact()
+		}
+	}
+	ivy {
+		url = uri("https://downloads.betterthanadventure.net/bta-server/${bta_channel}/")
+		patternLayout {
+			artifact "/v[revision]/server.jar"
+		}
+		metadataSources {
+			artifact()
+		}
+	}
+	ivy {
+		url = uri("https://piston-data.mojang.com")
+		patternLayout {
+			artifact "v1/[organisation]/[revision]/[module].jar"
+		}
+		metadataSources {
+			artifact()
+		}
+	}
+}
+
+
 dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.legacyfabric:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	minecraft("::${bta_version}")
+	mappings(loom.layered {})
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:${project.fabric_version}"
+	modRuntimeOnly("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45") // https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
+	modImplementation("net.fabricmc:fabric-loader:$project.loader_version")
 
-	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-	// You may need to force-disable transitiveness on them.
+	// Helper library
+	// If you do not need Halplibe you can comment this line out or delete this line
+	modImplementation("turniplabs:halplibe:$project.halplibe_version")
+
+	modImplementation("turniplabs:modmenu-bta:$project.mod_menu_version")
+
+	implementation("org.slf4j:slf4j-api:1.8.0-beta4")
+	implementation("org.apache.logging.log4j:log4j-slf4j18-impl:2.16.0")
+
+	implementation("com.google.guava:guava:33.0.0-jre")
+	implementation("com.google.code.gson:gson:2.10.1")
+
+	var log4jVersion = "2.20.0"
+	implementation("org.apache.logging.log4j:log4j-core:$log4jVersion")
+	implementation("org.apache.logging.log4j:log4j-api:$log4jVersion")
+	implementation("org.apache.logging.log4j:log4j-1.2-api:$log4jVersion")
+
+	implementation("org.apache.commons:commons-lang3:3.12.0")
+	include("org.apache.commons:commons-lang3:3.12.0")
+
+	modImplementation("com.github.Better-than-Adventure:legacy-lwjgl3:1.0.5")
+	implementation(platform("org.lwjgl:lwjgl-bom:$lwjglVersion"))
+
+	runtimeOnly("org.lwjgl:lwjgl::$lwjglNatives")
+	runtimeOnly("org.lwjgl:lwjgl-assimp::$lwjglNatives")
+	runtimeOnly("org.lwjgl:lwjgl-glfw::$lwjglNatives")
+	runtimeOnly("org.lwjgl:lwjgl-openal::$lwjglNatives")
+	runtimeOnly("org.lwjgl:lwjgl-opengl::$lwjglNatives")
+	runtimeOnly("org.lwjgl:lwjgl-stb::$lwjglNatives")
+	implementation("org.lwjgl:lwjgl:$lwjglVersion")
+	implementation("org.lwjgl:lwjgl-assimp:$lwjglVersion")
+	implementation("org.lwjgl:lwjgl-glfw:$lwjglVersion")
+	implementation("org.lwjgl:lwjgl-openal:$lwjglVersion")
+	implementation("org.lwjgl:lwjgl-opengl:$lwjglVersion")
+	implementation("org.lwjgl:lwjgl-stb:$lwjglVersion")
 }
 
 if (System.getenv("CURSEFORGE_TOKEN") != null) {
@@ -39,9 +142,9 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			changelog = project.changelog
 			releaseType = 'release'
 			addGameVersion "Fabric"
-			addGameVersion project.minecraft_version
+			addGameVersion "b1.7.3"
 			relations {
-				requiredDependency "legacy-fabric-api"
+				//requiredDependency "legacy-fabric-api"
 				//optionalDependency "simple-backpack-fabric"
 			}
 
@@ -54,14 +157,14 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 	modrinth {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'styMEyoE'
-		versionNumber = project.mod_version + "-fabric"
-		gameVersions = [project.minecraft_version]
+		versionNumber = project.mod_version + "-bta"
+		gameVersions = ["b1.7.3"]
 		versionType = 'release'
 		uploadFile = tasks.remapJar
 		changelog = project.changelog
-		loaders = ["legacy-fabric", "fabric"]
+		loaders = ["bta"]
 		dependencies {
-			required.project "legacy-fabric-api" // Fabric API
+			//required.project "legacy-fabric-api" // Fabric API
 		}
 	}
 }

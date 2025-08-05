@@ -3,10 +3,10 @@ package net.pitan76.storagebox;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.util.collection.DefaultedList;
 import org.apache.logging.log4j.Level;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StorageBoxUtil {
@@ -51,7 +51,7 @@ public class StorageBoxUtil {
         }
     }
 
-    public static void readNbt(NbtCompound tag, DefaultedList<ItemStack> items) {
+    public static void readNbt(NbtCompound tag, List<ItemStack> items) {
         NbtList nbtList = tag.getList("Items", 10); // 10 = CompoundTag
         items.clear();
 
@@ -60,17 +60,17 @@ public class StorageBoxUtil {
             NbtCompound itemNbt = nbtList.getCompound(i);
             int slot = itemNbt.getByte("Slot") & 255;
 
-            if (slot >= 0 && slot < items.size()) {
-                items.set(slot, new ItemStack(itemNbt));
+            if (slot < items.size()) {
+                items.set(slot, ItemStack.fromNbt(itemNbt));
             }
         }
     }
 
-    public static void writeNbt(NbtCompound tag, DefaultedList<ItemStack> items) {
+    public static void writeNbt(NbtCompound tag, List<ItemStack> items) {
         NbtList nbtList = new NbtList();
         for (int i = 0; i < items.size(); ++i) {
             ItemStack itemStack = items.get(i);
-            if (!itemStack.isEmpty()) {
+            if (itemStack != null && itemStack.count != 0) {
                 NbtCompound itemNbt = new NbtCompound();
                 itemNbt.putByte("Slot", (byte) i);
                 itemStack.toNbt(itemNbt);
@@ -79,5 +79,4 @@ public class StorageBoxUtil {
         }
         tag.put("Items", nbtList);
     }
-
 }

@@ -1,26 +1,25 @@
 package net.pitan76.storagebox.mixin;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.util.collection.DefaultedList;
 import net.pitan76.storagebox.ModConfig;
 import net.pitan76.storagebox.StorageBoxItem;
-import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
 import net.pitan76.storagebox.StorageBoxUtil;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(ItemEntity.class)
 public class ItemPickupMixin {
@@ -34,7 +33,7 @@ public class ItemPickupMixin {
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxItem.canInsertStack(pickupStack, stack)) return false;
-                StorageBoxItem.setItemStackSize(stack, StorageBoxItem.getItemDataAsInt(stack, StorageBoxItem.KEY_SIZE) + pickupStack.getCount());
+                StorageBoxItem.setItemStackSize(stack, StorageBoxItem.getItemDataAsInt(stack, StorageBoxItem.KEY_SIZE) + pickupStack.count);
                 return true;
             }
         }
@@ -46,7 +45,7 @@ public class ItemPickupMixin {
             NbtCompound nbt = stack.getNbt();
             if (nbt.contains("backpack")) {
                 NbtCompound backpackNbt = nbt.getCompound("backpack");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(54, ItemStack.EMPTY);
+                List<ItemStack> items = new ArrayList<>(54);
                 StorageBoxUtil.readNbt(backpackNbt, items);
 
                 int i;
@@ -63,32 +62,7 @@ public class ItemPickupMixin {
                 }
             }
         }
-
-        Boolean supportShulkerBox = ModConfig.getBoolean("SupportShulkerBox");
-        if (supportShulkerBox == null) supportShulkerBox = true;
-        // シュルカーボックスのサポート
-        if (supportShulkerBox && stack.getItem() instanceof BlockItem && ((BlockItem) stack.getItem()).getBlock() instanceof ShulkerBoxBlock) {
-            NbtCompound nbt = stack.getNbt();
-            if (nbt.contains("BlockEntityTag")) {
-                NbtCompound tileNbt = nbt.getCompound("BlockEntityTag");
-                DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
-                StorageBoxUtil.readNbt(tileNbt, items);
-
-                int i;
-                for (i = 0; i < items.size(); i++) {
-                    ItemStack inStack = items.get(i);
-                    if (process(inStack, pickupStack)) {
-                        // シュルカーボックス内のストレージボックスのNBTを更新
-                        items.set(i, inStack);
-                        StorageBoxUtil.writeNbt(tileNbt, items);
-                        nbt.put("BlockEntityTag", tileNbt);
-                        stack.setNbt(nbt);
-                        return true;
-                    }
-                }
-            }
-        }
-
+        
         return false;
     }
 
@@ -101,14 +75,13 @@ public class ItemPickupMixin {
 
         if (!itemEntity.world.isClient) {
             ItemStack itemStack = itemEntity.getItemStack();
-            Item item = itemStack.getItem();
-            int count = itemStack.getCount();
-            if (((ItemEntityAccessor)itemEntity).getPickupDelay() == 0 && (((ItemEntityAccessor)itemEntity).getOwner() == null || ((ItemEntityAccessor)itemEntity).getOwner().equals(player.getUuid()))) {
+            int count = itemStack.count;
+            if (((ItemEntityAccessor)itemEntity).getPickupDelay() == 0 && (((ItemEntityAccessor)itemEntity).getOwner() == null || ((ItemEntityAccessor)itemEntity).getOwner().equals(player.getCustomName()))) {
 
                 boolean insertedBox = false;
                 boolean checkedEnderChest = false;
                 // インベントリ
-                for (ItemStack inStack : player.inventory.field_15082) {
+                for (ItemStack inStack : player.inventory.main) {
                     // エンダーチェストが含まれていたらエンダーチェストもループ処理
                     if (supportEnderChest && inStack.getItem() == BlockItem.fromBlock(Blocks.ENDERCHEST) && !checkedEnderChest) {
                         for (int i = 0; i < player.getEnderChestInventory().getInvSize(); i++) {
@@ -116,7 +89,7 @@ public class ItemPickupMixin {
                             if (enderChestStack.hasNbt()) {
                                 if (process(enderChestStack, itemStack)) {
                                     insertedBox = true;
-                                    itemStack = ItemStack.EMPTY;
+                                    itemStack = null;
                                     checkedEnderChest = true;
                                     break;
                                 }
@@ -126,31 +99,18 @@ public class ItemPickupMixin {
                     if (inStack.hasNbt()) {
                         if (process(inStack, itemStack)) {
                             insertedBox = true;
-                            itemStack = ItemStack.EMPTY;
+                            itemStack = null;
                             break;
-                        }
-                    }
-                }
-
-                if (!insertedBox) {
-                    // オフハンド
-                    if (player.getOffHandStack().hasNbt()) {
-                        if (process(player.getOffHandStack(), itemStack)) {
-                            insertedBox = true;
-                            itemStack = ItemStack.EMPTY;
                         }
                     }
                 }
 
                 if (insertedBox) {
                     player.sendPickup(itemEntity, count);
-                    if (itemStack.isEmpty()) {
+                    if (itemStack == null || itemStack.count == 0) {
                         itemEntity.remove();
-                        itemStack.setCount(count);
                     }
 
-                    player.incrementStat(Stats.picked(item), count);
-                    //player.method_29499(itemEntity);
                     ci.cancel();
                 }
             }

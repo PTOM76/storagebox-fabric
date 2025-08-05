@@ -9,7 +9,7 @@ import static net.pitan76.storagebox.StorageBoxItem.*;
 
 public class StorageBoxSlot extends Slot {
 
-    private PlayerEntity player;
+    private final PlayerEntity player;
 
     public StorageBoxSlot(Inventory inventory, int index, int x, int y, PlayerEntity player) {
         super(inventory, index, x, y);
@@ -25,7 +25,7 @@ public class StorageBoxSlot extends Slot {
     @Override
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
-        if (itemStack.isEmpty()) {
+        if (itemStack == null || itemStack.count == 0) {
             ItemStack storageBoxStack = player.getMainHandStack();
             removeItemDataAsInt(storageBoxStack, KEY_SIZE);
             removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
@@ -35,14 +35,14 @@ public class StorageBoxSlot extends Slot {
         }
         ItemStack storageBoxStack = player.getMainHandStack();
         setItemStack(storageBoxStack, itemStack.copy());
-        setItemStackSize(storageBoxStack, itemStack.getCount());
+        setItemStackSize(storageBoxStack, itemStack.count);
     }
 
     @Override
     public ItemStack takeStack(int amount) {
         ItemStack storageBoxStack = player.getMainHandStack();
         if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
-        if (amount == getStack().getCount()) {
+        if (amount == getStack().count) {
             removeItemDataAsInt(storageBoxStack, KEY_SIZE);
             removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
             removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);

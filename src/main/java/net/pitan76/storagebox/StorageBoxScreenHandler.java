@@ -40,7 +40,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     };
 
     public static void init() {
-        //ContainerProviderRegistry.INSTANCE.registerFactory(StorageBoxMod.id("container"), FACTORY);
+
     }
 
     private final Inventory inventory;
@@ -71,27 +71,27 @@ public class StorageBoxScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack transferSlot(PlayerEntity player, int invSlot) {
-        ItemStack newStack = ItemStack.EMPTY;
+        ItemStack newStack = null;
         Slot slot = this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
             newStack = originalStack.copy();
             if (invSlot < this.inventory.getInvSize()) {
                 if (!this.insertItem(originalStack, this.inventory.getInvSize(), this.slots.size(), true)) {
-                    return ItemStack.EMPTY;
+                    return null;
                 }
             } else if (!this.insertItem(originalStack, 0, this.inventory.getInvSize(), false)) {
-                return ItemStack.EMPTY;
+                return null;
             }
 
-            if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+            if (originalStack.count == 0) {
+                slot.setStack(null);
             } else {
                 slot.markDirty();
             }
         }
 
-        return StorageBoxItem.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
+        return newStack != null && StorageBoxItem.canInsertStack(newStack) ? newStack : null;
     }
 
 }

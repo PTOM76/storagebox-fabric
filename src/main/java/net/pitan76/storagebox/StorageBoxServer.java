@@ -12,32 +12,28 @@ public class StorageBoxServer {
                 server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
-                        StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
-                        item.keyboardEvent(0, player, itemStack);
+                        StorageBoxItem.keyboardEvent(0, player, itemStack);
                     }
                 });
             if (str.equals("put_out_and_throw"))
                 server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
-                        StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
-                        item.keyboardEvent(1, player, itemStack);
+                        StorageBoxItem.keyboardEvent(1, player, itemStack);
                     }
                 });
             if (str.equals("put_in"))
                 server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
-                        StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
-                        item.keyboardEvent(2, player, itemStack);
+                        StorageBoxItem.keyboardEvent(2, player, itemStack);
                     }
                 });
             if (str.equals("auto_collect"))
                 server.submit(() -> {
                     if (player.getMainHandStack().getItem() instanceof StorageBoxItem) {
                         ItemStack itemStack = player.getMainHandStack();
-                        StorageBoxItem item = (StorageBoxItem) itemStack.getItem();
-                        item.keyboardEvent(3, player, itemStack);
+                        StorageBoxItem.keyboardEvent(3, player, itemStack);
                     }
                 });
         });

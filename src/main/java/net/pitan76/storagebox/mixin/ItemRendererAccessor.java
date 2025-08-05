@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(ItemRenderer.class)
 public interface ItemRendererAccessor {
 
-    @Invoker("method_12456")
-    public void invokeRenderGuiItemModel(ItemStack stack, int x, int y, BakedModel model);
+    @Invoker("renderGuiItemModel")
+    public void invokeRenderGuiItemModel(ItemStack stack, int x, int y);
 
 }

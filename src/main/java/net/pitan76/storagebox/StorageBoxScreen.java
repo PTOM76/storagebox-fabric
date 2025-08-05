@@ -42,11 +42,4 @@ public class StorageBoxScreen extends HandledScreen {
         textRenderer.draw(new TranslatableText("item.storagebox.storage").asFormattedString(), 8, 20, 4210752);
         textRenderer.draw(new TranslatableText("item.storagebox.storagebox.name").asFormattedString(), 8, 6, 4210752);
     }
-
-    @Override
-    public void render(int mouseX, int mouseY, float delta) {
-        this.renderBackground();
-        super.render(mouseX, mouseY, delta);
-        this.renderTooltip(mouseX, mouseY);
-    }
 }

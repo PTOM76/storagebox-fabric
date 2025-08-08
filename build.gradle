@@ -59,7 +59,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 		versionType = 'release'
 		uploadFile = tasks.remapJar
 		changelog = project.changelog
-		loaders = ["legacy-fabric"]
+		loaders = ["legacy-fabric", "fabric"]
 		dependencies {
 			required.project "legacy-fabric-api" // Fabric API
 		}

@@ -3,6 +3,7 @@ package net.pitan76.storagebox;
 import net.fabricmc.api.ModInitializer;
 import net.legacyfabric.fabric.api.registry.v2.RegistryHelper;
 import net.legacyfabric.fabric.api.registry.v2.RegistryIds;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeDispatcher;
 import net.minecraft.util.Identifier;
@@ -21,6 +22,12 @@ public class StorageBoxMod implements ModInitializer
         RegistryHelper.register(RegistryIds.ITEMS, lfid("storagebox"), StorageBoxItem.instance);
 
         RecipeDispatcher.getInstance().addRecipeType(new AutoCollectRecipe(new ItemStack(StorageBoxItem.instance, 1, -1)));
+        RecipeDispatcher.getInstance().registerShapedRecipe(new ItemStack(StorageBoxItem.instance, 1, -1),
+                "###",
+                "# #",
+                "###",
+                '#', Blocks.CHEST
+        );
 
         StorageBoxScreenHandler.init();
         StorageBoxServer.init();

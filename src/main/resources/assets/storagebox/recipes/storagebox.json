@@ -1,0 +1,17 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "XXX",
+    "X X",
+    "XXX"
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:chest"
+    }
+  },
+  "result": {
+    "item": "storagebox:storagebox",
+    "count": 1
+  }
+}

@@ -1,5 +1,6 @@
 package net.pitan76.storagebox;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -39,6 +40,18 @@ public class StorageBoxServer {
                 );
 
             }));
+        });
+        ServerTickEvents.END_WORLD_TICK.register(world -> { // 万一スタックが整理MOD等で変化したら強制的に閉じる
+            for(ServerPlayerEntity player : world.getPlayers()){
+                if (!player.isRemoved()) {
+                    if(player.currentScreenHandler instanceof StorageBoxScreenHandler storageBoxScreenHandler){
+                        if(player.getMainHandStack().getItem() != StorageBoxItem.instance || storageBoxScreenHandler.handStack != player.getMainHandStack()){
+                            player.closeHandledScreen();
+                        }
+                    }
+                }
+
+            }
         });
     }
 }

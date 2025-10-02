@@ -10,6 +10,7 @@ import net.minecraft.resource.featuretoggle.FeatureSet;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 
 public class StorageBoxScreenHandler extends ScreenHandler {
 
@@ -20,6 +21,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     }
 
     private final Inventory inventory;
+    public final ItemStack handStack;
 
     public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
         this(syncId, playerInventory);
@@ -28,17 +30,31 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(SCREEN_HANDLER_TYPE, syncId);
         inventory = new StorageBoxInventory();
+        handStack = playerInventory.getMainHandStack();
         int m, l;
 
-        addSlot(new StorageBoxSlot(inventory, 0, 12, 35, playerInventory.player));
+        addSlot(new StorageBoxSlot(this, inventory, 0, 12, 35, playerInventory.player));
+        for (m = 0; m < 9; ++m) {
+            addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
+        }
         for (m = 0; m < 3; ++m) {
             for (l = 0; l < 9; ++l) {
                 addSlot(new Slot(playerInventory, l + m * 9 + 9, 8 + l * 18, 84 + m * 18));
             }
         }
-        for (m = 0; m < 9; ++m) {
-            addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
+    }
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        PlayerInventory playerInventory = player.getInventory();
+        int playerSlotIndex = slotIndex-1;
+        // System.out.println(slotIndex-1);
+        if ((playerSlotIndex >= 0 && playerSlotIndex < 36 || playerSlotIndex == 40) && playerInventory.getStack(playerSlotIndex) == handStack) {
+            return;
         }
+        super.onSlotClick(slotIndex, button, actionType, player);
+    }
+    public ItemStack getHandStack() {
+        return this.handStack;
     }
 
     @Override

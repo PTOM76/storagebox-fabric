@@ -62,31 +62,27 @@ public class StorageBoxClient implements ClientModInitializer {
                     if (isKeyDownShift()) {
                         if (isKeyDownCtrl()) {
                             // ドロップ: (: + Shift + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out_and_throw");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_out_and_throw");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         } else {
                             // 取り出す or コンテナーへ一括収納: (: + Shift)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_out");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_out");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         }
 
                     } else {
                         if (isKeyDownCtrl()) {
                             // AutoCollect切り替え: (: + Ctrl)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "auto_collect");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("auto_collect");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         } else {
                             // コンテナーやインベントリからすべてストレージボックスへ一括収納: (:)
-                            PacketByteBuf BUF = PacketByteBufs.create();
-                            NbtCompound tag = new NbtCompound();tag.putString("type", "put_in");
-                            BUF.writeNbt(tag);
-                            ClientPlayNetworking.send(StorageBoxMod.id("key"), BUF);
+                            PacketByteBuf buf = PacketByteBufs.create();
+                            buf.writeString("put_in");
+                            ClientPlayNetworking.send(StorageBoxMod.id("key"), buf);
                         }
                     }
                 }

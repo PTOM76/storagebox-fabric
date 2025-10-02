@@ -10,10 +10,12 @@ import static net.pitan76.storagebox.StorageBoxItem.*;
 public class StorageBoxSlot extends Slot {
 
     private PlayerEntity player;
+    private final StorageBoxScreenHandler handler;
 
-    public StorageBoxSlot(Inventory inventory, int index, int x, int y, PlayerEntity player) {
+    public StorageBoxSlot(StorageBoxScreenHandler handler, Inventory inventory, int index, int x, int y, PlayerEntity player) {
         super(inventory, index, x, y);
         this.player = player;
+        this.handler = handler;
 
     }
 
@@ -26,20 +28,20 @@ public class StorageBoxSlot extends Slot {
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
-            ItemStack storageBoxStack = player.getMainHandStack();
+            ItemStack storageBoxStack = handler.getHandStack();
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
             removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
             return;
         }
-        ItemStack storageBoxStack = player.getMainHandStack();
+        ItemStack storageBoxStack = handler.getHandStack();
         setItemStack(storageBoxStack, itemStack.copy());
         setItemStackSize(storageBoxStack, itemStack.getCount());
     }
 
     @Override
     public ItemStack takeStack(int amount) {
-        ItemStack storageBoxStack = player.getMainHandStack();
+        ItemStack storageBoxStack = handler.getHandStack();
         if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
         if (amount == getStack().getCount()) {
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);

@@ -1,18 +1,18 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 
+import static net.pitan76.storagebox.StorageBoxItem.*;
+
 public class StorageBoxSlot extends Slot {
 
-    private PlayerEntity player;
+    private final StorageBoxScreenHandler handler;
 
-    public StorageBoxSlot(Inventory inventory, int index, int x, int y, PlayerEntity player) {
+    public StorageBoxSlot(StorageBoxScreenHandler handler, Inventory inventory, int index, int x, int y) {
         super(inventory, index, x, y);
-        this.player = player;
-
+        this.handler = handler;
     }
 
     @Override
@@ -24,29 +24,29 @@ public class StorageBoxSlot extends Slot {
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
         if (itemStack.isEmpty()) {
-            ItemStack storageBoxStack = player.getMainHandStack();
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_DATA);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_ID);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_AUTO);
+            ItemStack storageBoxStack = handler.getHandStack();
+            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
+            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
             return;
         }
-        ItemStack storageBoxStack = player.getMainHandStack();
-        StorageBoxItem.setItemStack(storageBoxStack, itemStack.copy());
-        StorageBoxItem.setItemStackSize(storageBoxStack, itemStack.getCount());
+        ItemStack storageBoxStack = handler.getHandStack();
+        setItemStack(storageBoxStack, itemStack.copy());
+        setItemStackSize(storageBoxStack, itemStack.getCount());
     }
 
     @Override
     public ItemStack takeStack(int amount) {
-        ItemStack storageBoxStack = player.getMainHandStack();
+        ItemStack storageBoxStack = handler.getHandStack();
         if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
         if (amount == getStack().getCount()) {
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_DATA);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_ID);
-            StorageBoxItem.removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_AUTO);
+            removeItemDataAsInt(storageBoxStack, KEY_SIZE);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_DATA);
+            removeItemDataAsInt(storageBoxStack, KEY_ITEM_ID);
+            removeItemDataAsInt(storageBoxStack, KEY_AUTO);
         } else {
-            StorageBoxItem.setItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE, StorageBoxItem.getItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE) - amount);
+            setItemDataAsInt(storageBoxStack, KEY_SIZE, getItemDataAsInt(storageBoxStack, KEY_SIZE) - amount);
         }
         return super.takeStack(amount);
     }

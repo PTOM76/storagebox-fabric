@@ -1,5 +1,6 @@
 package net.pitan76.storagebox;
 
+import net.minecraft.util.Identifier;
 import net.pitan76.storagebox.mixin.KeyBindingAccessor;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -23,7 +24,7 @@ public class StorageBoxClient implements ClientModInitializer {
                 "key.storagebox.colon",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_APOSTROPHE,
-                "key.storagebox.category"
+                new KeyBinding.Category(Identifier.of("storagebox", "main"))
         ));
         HandledScreens.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
 
@@ -67,7 +68,7 @@ public class StorageBoxClient implements ClientModInitializer {
 
     private boolean isKeyPressed() {
         final Window mw = MinecraftClient.getInstance().getWindow();
-        if (InputUtil.isKeyPressed(mw.getHandle(), ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
+        if (InputUtil.isKeyPressed(mw, ((KeyBindingAccessor) keyBinding_COLON).getBoundKey().getCode())) {
             if (coolDown <= 0) {
                 coolDown = 3;
                 return true;
@@ -80,13 +81,13 @@ public class StorageBoxClient implements ClientModInitializer {
 
     private boolean isKeyDownShift() {
         final Window mw = MinecraftClient.getInstance().getWindow();
-        return InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return InputUtil.isKeyPressed(mw, GLFW.GLFW_KEY_LEFT_SHIFT)
+                || InputUtil.isKeyPressed(mw, GLFW.GLFW_KEY_RIGHT_SHIFT);
     }
 
     private boolean isKeyDownCtrl() {
         final Window mw = MinecraftClient.getInstance().getWindow();
-        return InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL)
-                || InputUtil.isKeyPressed(mw.getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return InputUtil.isKeyPressed(mw, GLFW.GLFW_KEY_LEFT_CONTROL)
+                || InputUtil.isKeyPressed(mw, GLFW.GLFW_KEY_RIGHT_CONTROL);
     }
 }

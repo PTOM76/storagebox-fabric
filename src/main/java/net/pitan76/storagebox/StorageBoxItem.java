@@ -160,6 +160,7 @@ public class StorageBoxItem extends Item {
                 itemInBoxCount = 64;
                 countInBox -= 64;
             }
+
             stack.setCount(0);
             user.setStackInHand(hand, stack);
             stack.setCount(itemInBoxCount);
@@ -219,7 +220,7 @@ public class StorageBoxItem extends Item {
             return canUse ? ActionResult.SUCCESS : ActionResult.PASS;
         }
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory(StorageBoxScreenHandler::new, Text.literal(""));
             user.openHandledScreen(screenHandlerFactory);
         }

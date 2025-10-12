@@ -4,11 +4,7 @@ import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.type.ContainerComponent;
-import net.minecraft.inventory.Inventories;
 import net.minecraft.item.BlockItem;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.pitan76.storagebox.DataComponentTypes;
 import net.pitan76.storagebox.ModConfig;
@@ -104,7 +100,7 @@ public class ItemPickupMixin {
         Boolean supportEnderChest = ModConfig.getBoolean("SupportEnderChest");
         if (supportEnderChest == null) supportEnderChest = true;
 
-        if (!itemEntity.getWorld().isClient) {
+        if (!itemEntity.getEntityWorld().isClient()) {
             ItemStack itemStack = itemEntity.getStack();
             Item item = itemStack.getItem();
             int count = itemStack.getCount();

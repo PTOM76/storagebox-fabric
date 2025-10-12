@@ -3,12 +3,10 @@ package net.pitan76.storagebox;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.*;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
@@ -65,7 +63,6 @@ public class StorageBoxItem extends Item {
 
     // nulll のときは hasStackInStorageBox(storageBoxStack) で判定すること
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
-        ItemStack result;
         if (storageBoxStack.getComponents().isEmpty()) return null;
 
         /*
@@ -177,8 +174,8 @@ public class StorageBoxItem extends Item {
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
             if (stack != null) {
-            player.sendMessage(Text.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT), true, stack.getMaxCount())), true);
-            return;
+                player.sendMessage(Text.literal(stack.getName().getString() + "/" + calcItemNumByUnit(getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT), true, stack.getMaxCount())), true);
+                return;
             }
         }
         player.sendMessage(Text.literal("Empty"), true);
@@ -198,14 +195,15 @@ public class StorageBoxItem extends Item {
         ItemStack storageBoxStack = user.getStackInHand(hand);
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
+            int stackMax = stack.getMaxCount();
             boolean canUse = true;
             int countInBox = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
             int itemInBoxCount = countInBox;
             boolean countIsOverMax = false;
-            if (countInBox > 64) {
+            if (countInBox > stackMax) {
                 countIsOverMax = true;
-                itemInBoxCount = 64;
-                countInBox -= 64;
+                itemInBoxCount = stackMax;
+                countInBox -= stackMax;
             }
             stack.setCount(0);
             user.setStackInHand(hand, stack);
@@ -221,7 +219,6 @@ public class StorageBoxItem extends Item {
             storageBoxStack.setCount(0);
             user.setStackInHand(hand, storageBoxStack);
             storageBoxStack.setCount(i);
-
 
             if (result.getResult() == ActionResult.FAIL) {
                 return new TypedActionResult<>(result.getResult(), storageBoxStack);
@@ -246,18 +243,18 @@ public class StorageBoxItem extends Item {
                 countInBox = stack.getCount();
             }
 
-            if (stack.getCount() <= 0) {
+            if (countInBox <= 0) {
                 removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                 removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
                 removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
 
             } else {
                 setItemStackSize(storageBoxStack, countInBox);
-                setItemStack(storageBoxStack, stack);
+                //setItemStack(storageBoxStack, stack);
             }
             return canUse ? TypedActionResult.success(storageBoxStack) : TypedActionResult.pass(storageBoxStack);
         }
-        if (!world.isClient) {
+        if (!world.isClient && storageBoxStack.equals(user.getEquippedStack(EquipmentSlot.MAINHAND))) {
             NamedScreenHandlerFactory screenHandlerFactory = new SimpleNamedScreenHandlerFactory(StorageBoxScreenHandler::new, Text.literal(""));
             user.openHandledScreen(screenHandlerFactory);
         }
@@ -269,13 +266,22 @@ public class StorageBoxItem extends Item {
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
-            stack.setCount(64);
+            int stackMax = stack.getMaxCount();
+            stack.setCount(stackMax);
             ItemStack result = item.finishUsing(stack, world, user);
 
             // ポーション => ガラス瓶などのサポート
-            if (!stack.getItem().equals((result.getItem())))
-                dropItemStack(user, result);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+            if (!stack.getItem().equals((result.getItem()))){
+                if (user instanceof PlayerEntity playerEntity) {
+                    if(!playerEntity.getInventory().insertStack(result)){
+                        dropItemStack(user, result);
+                    }
+                }else{
+                    dropItemStack(user, result);
+                }
+            }
+
+            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (stackMax - stack.getCount()));
         }
 
         return super.finishUsing(storageBoxStack, world, user);
@@ -287,9 +293,10 @@ public class StorageBoxItem extends Item {
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
-            stack.setCount(64);
+            int stackMax = stack.getMaxCount();
+            stack.setCount(stackMax);
             boolean result = item.postMine(stack, world, state, pos, miner);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (stackMax - stack.getCount()));
             return result;
         }
 
@@ -303,9 +310,55 @@ public class StorageBoxItem extends Item {
 
         if (item != null && hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
-            stack.setCount(64);
+            int stackMax = stack.getMaxCount();
+            int countInBox = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+            int itemInBoxCount = countInBox;
+            boolean countIsOverMax = false;
+            if (countInBox > stackMax) {
+                countIsOverMax = true;
+                itemInBoxCount = stackMax;
+                countInBox -= stackMax;
+            }
+            stack.setCount(itemInBoxCount);
+            ItemStack preStack = stack.copy();
             result = item.useOnEntity(stack, user, entity, hand);
-            setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+
+            if(user.isInCreativeMode()){ //クリエイティブで数に変化があればロールバックする(exam.鞍、名札が該当。染料は変わらない)
+                ItemStack tempStack1 = preStack.copy();
+                tempStack1.setCount(1);
+                ItemStack tempStack2 = stack.copy();
+                tempStack2.setCount(1);
+                if(stack.isEmpty() && !preStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
+                    stack = preStack.copy();
+                }
+
+            }
+            if (!stack.isEmpty()){  //中身に変化があれば取り出して空にする
+                ItemStack tempStack1 = preStack.copy();
+                tempStack1.setCount(1);
+                ItemStack tempStack2 = stack.copy();
+                tempStack2.setCount(1);
+                if(!ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2)){  //数以外のコンポーネントが変化した
+                    if(!user.getInventory().insertStack(stack)){
+                        dropItemStack(user, stack);
+                    }
+                    stack.setCount(0);
+                }
+            }
+            if (countIsOverMax) {
+                countInBox += stack.getCount();
+            } else {
+                countInBox = stack.getCount();
+            }
+            if (countInBox <= 0) {
+                removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
+                removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
+                removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
+            } else {
+                setItemStackSize(storageBoxStack, countInBox);
+                //setItemStack(storageBoxStack, stack);
+            }
+            //setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (stackMax - stack.getCount()));
         } else {
             result = super.useOnEntity(storageBoxStack, user, entity, hand);
         }
@@ -350,9 +403,10 @@ public class StorageBoxItem extends Item {
         }
 
         ItemStack stack = getStackInStorageBox(storageBoxStack).copy();
-        stack.setCount(64);
+        int stackMax = stack.getMaxCount();
+        stack.setCount(stackMax);
         item.onStoppedUsing(stack, world, user, remainingUseTicks);
-        setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (64 - stack.getCount()));
+        setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (stackMax - stack.getCount()));
     }
 
     @Override
@@ -363,24 +417,26 @@ public class StorageBoxItem extends Item {
         ItemStack storageBoxStack = user.getStackInHand(hand);
         if (hasStackInStorageBox(storageBoxStack)) {
             ItemStack stack = getStackInStorageBox(storageBoxStack);
+            int stackMax = stack.getMaxCount();
             boolean canUse = true;
             int countInBox = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
             int itemInBoxCount = countInBox;
             boolean countIsOverMax = false;
-            if (countInBox > 64) {
+            if (countInBox > stackMax) {
                 countIsOverMax = true;
-                itemInBoxCount = 64;
-                countInBox -= 64;
+                itemInBoxCount = stackMax;
+                countInBox -= stackMax;
             }
             stack.setCount(0);
             user.setStackInHand(hand, stack);
             stack.setCount(itemInBoxCount);
+            ItemStack preStack = stack.copy();
 
             ActionResult result;
 
             BlockHitResult hit = new BlockHitResult(context.getHitPos(), context.getSide(), context.getBlockPos(), context.hitsInsideBlock());
             result = stack.useOnBlock(new ItemUsageContext(context.getWorld(), context.getPlayer(), context.getHand(), stack, hit));
-
+            stack = context.getPlayer().getStackInHand(context.getHand());  // ブロックを置いたorブロックにアイテムを使った時の手に変える
             if (result != ActionResult.SUCCESS) {
                 canUse = false;
             }
@@ -394,20 +450,41 @@ public class StorageBoxItem extends Item {
                 stack.decrement(1);
             }
             */
+            if(user.isInCreativeMode()){ //クリエイティブで数に変化があればロールバックする(exam.花火、ファイヤチャージ)
+                ItemStack tempStack1 = preStack.copy();
+                tempStack1.setCount(1);
+                ItemStack tempStack2 = stack.copy();
+                tempStack2.setCount(1);
+                if(stack.isEmpty() && !preStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
+                    stack = preStack.copy();
+                }
 
+            }
+            if (!stack.isEmpty()){  //中身に変化があれば取り出して空にする
+                ItemStack tempStack1 = preStack.copy();
+                tempStack1.setCount(1);
+                ItemStack tempStack2 = stack.copy();
+                tempStack2.setCount(1);
+                if(!ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2)){  //数以外のコンポーネントが変化した
+                    if(!user.getInventory().insertStack(stack)){
+                        dropItemStack(user, stack);
+                    }
+                    stack.setCount(0);
+                }
+            }
             if (countIsOverMax) {
                 countInBox += stack.getCount();
             } else {
                 countInBox = stack.getCount();
             }
 
-            if (stack.getCount() <= 0) {
+            if (countInBox <= 0) {
                 removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                 removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
                 removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
             } else {
                 setItemStackSize(storageBoxStack, countInBox);
-                setItemStack(storageBoxStack, stack);
+                //setItemStack(storageBoxStack, stack);
             }
             return canUse ? ActionResult.SUCCESS : ActionResult.PASS;
         }
@@ -416,6 +493,9 @@ public class StorageBoxItem extends Item {
 
     // 0 = 取り出し(インベントリオープン時はコンテナーへ収納) 1 = 取り出してドロップ 2 = ストレージボックスへ収納(インベントリオープン時はコンテナーからストレージボックスへ収納) 3 = AutoCollect切り替え
     public static void keyboardEvent(int type, PlayerEntity player, ItemStack storageBoxStack) {
+        if(player.currentScreenHandler instanceof StorageBoxScreenHandler){
+            return;     // StorageBoxScreenHandlerは増殖できてしまうので対策
+        }
         if (type == 0) {
             if (player.currentScreenHandler != null && !(player.currentScreenHandler instanceof PlayerScreenHandler) && !(player.currentScreenHandler.slots.size() <= 0)) {
                 // コンテナー
@@ -427,12 +507,12 @@ public class StorageBoxItem extends Item {
                         ItemStack stack = slot.getStack();
                         if (!stack.isEmpty()) continue;
                         ItemStack newStack = itemInBox.copy();
-
+                        int stackMax = itemInBox.getMaxCount();
                         // 64より大きい
-                        if (count > 64) {
-                            newStack.setCount(64);
+                        if (count > stackMax) {
+                            newStack.setCount(stackMax);
                             slot.setStack(newStack);
-                            count -= 64;
+                            count -= stackMax;
                         } else {
                             newStack.setCount(count);
                             slot.setStack(newStack);
@@ -448,16 +528,17 @@ public class StorageBoxItem extends Item {
             }
             if (hasStackInStorageBox(storageBoxStack)) {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
+                int stackMax = itemInBox.getMaxCount();
                 int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                 ItemStack giveStack = itemInBox.copy();
-                if (count > 64) {
-                    giveStack.setCount(64);
+                if (count > stackMax) {
+                    giveStack.setCount(stackMax);
                     if (canGive(player.getInventory().main)) {
                         player.giveItemStack(giveStack);
                     } else {
                         player.dropItem(giveStack, false);
                     }
-                    setItemStackSize(storageBoxStack, count - 64);
+                    setItemStackSize(storageBoxStack, count - stackMax);
                 } else {
                     giveStack.setCount(count);
                     if (canGive(player.getInventory().main)) {
@@ -477,10 +558,11 @@ public class StorageBoxItem extends Item {
                 ItemStack itemInBox = getStackInStorageBox(storageBoxStack);
                 int count = getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                 ItemStack dropStack = itemInBox.copy();
-                if (count > 64) {
-                    dropStack.setCount(64);
+                int stackMax = itemInBox.getMaxCount();
+                if (count > stackMax) {
+                    dropStack.setCount(stackMax);
                     player.dropItem(dropStack, false);
-                    setItemStackSize(storageBoxStack, count - 64);
+                    setItemStackSize(storageBoxStack, count - stackMax);
                 } else {
                     dropStack.setCount(count);
                     player.dropItem(dropStack, false);

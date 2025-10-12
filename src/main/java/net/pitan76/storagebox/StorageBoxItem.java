@@ -3,6 +3,7 @@ package net.pitan76.storagebox;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.component.ComponentType;
+import net.minecraft.component.type.FoodComponent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -225,6 +226,11 @@ public class StorageBoxItem extends Item {
             } else if (stack.getItem().equals(result.getValue().getItem())) {
                 // 食べ物など一定の時間を使って消費するアイテム
                 if (user.isUsingItem()) {
+                    if (stack.contains(net.minecraft.component.DataComponentTypes.FOOD)) {
+                        FoodComponent food = stack.get(net.minecraft.component.DataComponentTypes.FOOD);
+                        storageBoxStack.set(net.minecraft.component.DataComponentTypes.FOOD, food);
+                    }
+
                     user.stopUsingItem();
                     user.setCurrentHand(hand);
                 }
@@ -273,16 +279,17 @@ public class StorageBoxItem extends Item {
             // ポーション => ガラス瓶などのサポート
             if (!stack.getItem().equals((result.getItem()))){
                 if (user instanceof PlayerEntity playerEntity) {
-                    if(!playerEntity.getInventory().insertStack(result)){
+                    if (!playerEntity.getInventory().insertStack(result)){
                         dropItemStack(user, result);
                     }
-                }else{
+                } else {
                     dropItemStack(user, result);
                 }
             }
 
             setItemStackSize(storageBoxStack, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - (stackMax - stack.getCount()));
         }
+        storageBoxStack.remove(net.minecraft.component.DataComponentTypes.FOOD);
 
         return super.finishUsing(storageBoxStack, world, user);
     }

@@ -30,7 +30,7 @@ public class StorageBoxScreenHandler extends ScreenHandler {
     public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
         super(SCREEN_HANDLER_TYPE, syncId);
         inventory = new StorageBoxInventory();
-        handStack = playerInventory.getMainHandStack();
+        handStack = playerInventory.player.getMainHandStack();
         int m, l;
 
         addSlot(new StorageBoxSlot(this, inventory, 0, 12, 35, playerInventory.player));

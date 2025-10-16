@@ -46,7 +46,9 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			changelog = project.changelog
 			releaseType = 'release'
 			addGameVersion "Fabric"
-			addGameVersion project.minecraft_version
+			addGameVersion "1.18"
+            addGameVersion "1.18.1"
+            addGameVersion "1.18.2"
 			relations {
 				requiredDependency "fabric-api"
 				optionalDependency "simple-backpack-fabric"
@@ -62,7 +64,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'styMEyoE'
 		versionNumber = project.mod_version + "-fabric"
-		gameVersions = [project.minecraft_version]
+		gameVersions = ["1.18", "1.18.1", "1.18.2"]
 		versionType = 'release'
 		uploadFile = tasks.remapJar
 		changelog = project.changelog

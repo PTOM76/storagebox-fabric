@@ -231,11 +231,12 @@ public class StorageBoxItem extends Item {
                     user.setCurrentHand(hand);
                 }
             } else {
-                // バケツ => 液体バケツなどのサポート
-                if (!result.getValue().isEmpty())
-                    user.getInventory().offerOrDrop(result.getValue());
-                if (result.getResult().equals(ActionResult.CONSUME)) {
-                    stack.setCount(stack.getCount() - 1);
+                // バケツから液体バケツなどのサポート
+                stack.setCount(itemInBoxCount - 1);
+                if (result.getResult().equals(ActionResult.CONSUME) || result.getValue() != stack) {
+                    ItemStack copyNewStack = result.getValue().copy();
+                    copyNewStack.setCount(1);
+                    user.getInventory().offerOrDrop(copyNewStack);
                 }
             }
 

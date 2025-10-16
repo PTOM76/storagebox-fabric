@@ -9,15 +9,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
+import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -38,6 +37,7 @@ public class StorageBoxItem extends Item {
     public static String KEY_SIZE = "StorageSize";
     public static String KEY_AUTO = "StorageAuto"; // 0 = true, 1 = false
     public static String KEY_ITEM_DATA = "StorageItemData";
+    public static final TagKey<Item> STORAGEBOX_BLACKLIST = TagKey.of(RegistryKeys.ITEM, Identifier.of(StorageBoxMod.MOD_ID, "storagebox_blacklist"));  // storageboxに入れることができないアイテム
 
     public static Item getItem(ItemStack storageBoxStack) {
         ItemStack stack = getStackInStorageBox(storageBoxStack);
@@ -160,7 +160,7 @@ public class StorageBoxItem extends Item {
 
     public static void setItemStackSize(ItemStack storageBoxStack, int size) {
         if (storageBoxStack == ItemStack.EMPTY) return;
-        setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, size);
+        setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, Math.max(size, 0));
     }
 
     //
@@ -223,7 +223,7 @@ public class StorageBoxItem extends Item {
 
             if (result.getResult() == ActionResult.FAIL) {
                 return new TypedActionResult<>(result.getResult(), storageBoxStack);
-            } else if (stack.getItem().equals(result.getValue().getItem())) {
+            } else if (canInsertStack(result.getValue(), storageBoxStack)) {
                 // 食べ物など一定の時間を使って消費するアイテム
                 if (user.isUsingItem()) {
                     if (stack.contains(net.minecraft.component.DataComponentTypes.FOOD)) {
@@ -236,10 +236,10 @@ public class StorageBoxItem extends Item {
                 }
             } else {
                 // バケツから液体バケツなどのサポート
-                stack.setCount(itemInBoxCount - 1);
+                // stack.setCount(itemInBoxCount - 1);  // ここで数を減らすとインベントリが埋まっている時にバンドルのようなアイテムが消えてしまう(1.21~1.21.1のみ)
                 if (result.getResult().equals(ActionResult.CONSUME) || result.getValue() != stack) {
                     ItemStack copyNewStack = result.getValue().copy();
-                    copyNewStack.setCount(1);
+                    // copyNewStack.setCount(1);
                     user.getInventory().offerOrDrop(copyNewStack);
                 }
             }
@@ -278,7 +278,7 @@ public class StorageBoxItem extends Item {
             ItemStack result = item.finishUsing(stack, world, user);
 
             // ポーション => ガラス瓶などのサポート
-            if (!stack.getItem().equals((result.getItem()))){
+            if (!canInsertStack(result, storageBoxStack)){
                 if (user instanceof PlayerEntity playerEntity) {
                     if (!playerEntity.getInventory().insertStack(result)){
                         dropItemStack(user, result);
@@ -332,21 +332,13 @@ public class StorageBoxItem extends Item {
             result = item.useOnEntity(stack, user, entity, hand);
 
             if(user.isInCreativeMode()){ //クリエイティブで数に変化があればロールバックする(exam.鞍、名札が該当。染料は変わらない)
-                ItemStack tempStack1 = preStack.copy();
-                tempStack1.setCount(1);
-                ItemStack tempStack2 = stack.copy();
-                tempStack2.setCount(1);
-                if(stack.isEmpty() && !preStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
+                if(stack.isEmpty() && !preStack.isEmpty() || canInsertStack(stack, storageBoxStack) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
                     stack = preStack.copy();
                 }
 
             }
             if (!stack.isEmpty()){  //中身に変化があれば取り出して空にする
-                ItemStack tempStack1 = preStack.copy();
-                tempStack1.setCount(1);
-                ItemStack tempStack2 = stack.copy();
-                tempStack2.setCount(1);
-                if(!ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2)){  //数以外のコンポーネントが変化した
+                if(!canInsertStack(stack, storageBoxStack)){  //数以外のコンポーネントが変化した
                     if(!user.getInventory().insertStack(stack)){
                         dropItemStack(user, stack);
                     }
@@ -459,21 +451,13 @@ public class StorageBoxItem extends Item {
             }
             */
             if(user.isInCreativeMode()){ //クリエイティブで数に変化があればロールバックする(exam.花火、ファイヤチャージ)
-                ItemStack tempStack1 = preStack.copy();
-                tempStack1.setCount(1);
-                ItemStack tempStack2 = stack.copy();
-                tempStack2.setCount(1);
-                if(stack.isEmpty() && !preStack.isEmpty() || ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
+                if(stack.isEmpty() && !preStack.isEmpty() || canInsertStack(stack, storageBoxStack) && preStack.getCount() != stack.getCount()){    //コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
                     stack = preStack.copy();
                 }
 
             }
             if (!stack.isEmpty()){  //中身に変化があれば取り出して空にする
-                ItemStack tempStack1 = preStack.copy();
-                tempStack1.setCount(1);
-                ItemStack tempStack2 = stack.copy();
-                tempStack2.setCount(1);
-                if(!ItemStack.areItemsAndComponentsEqual(tempStack1, tempStack2)){  //数以外のコンポーネントが変化した
+                if(!canInsertStack(stack, storageBoxStack)){  //数以外のコンポーネントが変化した
                     if(!user.getInventory().insertStack(stack)){
                         dropItemStack(user, stack);
                     }
@@ -591,11 +575,21 @@ public class StorageBoxItem extends Item {
                         ItemStack stack = slot.getStack();
                         if (stack.getItem() == itemInBox.getItem()) {
                             if (!canInsertStack(stack, storageBoxStack)) continue;
-                            count += stack.getCount();
-                            player.getInventory().removeOne(stack);
-                            stack.setCount(0);
-                            stack = ItemStack.EMPTY;
-                            slot.setStack(stack);
+                            int storageCount;
+                            if (((long)count)+((long)stack.getCount()) > 2147483647){   //2147483647以上は収納しようとしない
+                                storageCount = 2147483647-count;
+                            } else {
+                                storageCount = stack.getCount();
+                            }
+                            if (storageCount > 0) {
+                                count += storageCount;
+                                // player.getInventory().removeOne(stack);
+                                // stack.setCount(0);
+                                stack.decrement(storageCount);
+                                //stack = ItemStack.EMPTY;
+                                slot.setStack(stack);
+
+                            }
                         }
                     }
                     setItemStackSize(storageBoxStack, count);
@@ -608,9 +602,17 @@ public class StorageBoxItem extends Item {
                 for (ItemStack stack : player.getInventory().main) {
                     if (stack.getItem() == itemInBox.getItem()) {
                         if (!canInsertStack(stack, storageBoxStack)) continue;
-                        count += stack.getCount();
-                        player.getInventory().removeOne(stack);
-                        stack.setCount(0);
+                        int storageCount;
+                        if (((long)count)+((long)stack.getCount()) > 2147483647){   //2147483647以上は収納しようとしない
+                            storageCount = 2147483647-count;
+                        } else {
+                            storageCount = stack.getCount();
+                        }
+                        if (storageCount > 0) {
+                            count += storageCount;
+                            stack.decrement(storageCount);
+
+                        }
                     }
                 }
                 setItemStackSize(storageBoxStack, count);
@@ -690,6 +692,7 @@ public class StorageBoxItem extends Item {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
+        if (stack.isIn(STORAGEBOX_BLACKLIST)) return false;
         return true;
     }
 
@@ -697,6 +700,7 @@ public class StorageBoxItem extends Item {
         if (stack.getItem() == StorageBoxItem.instance) return false;
         if (stack.isEnchantable()) return false;
         if (stack.isDamageable()) return false;
+        if (stack.isIn(STORAGEBOX_BLACKLIST)) return false;
         if (!stack.getComponents().isEmpty()) {
             ItemStack stackInBox = getStackInStorageBox(storageBoxStack);
             if (stackInBox == null || stackInBox.isEmpty()) return false;

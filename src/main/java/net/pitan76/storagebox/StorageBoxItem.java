@@ -248,7 +248,7 @@ public class StorageBoxItem extends Item {
 
             if (result.getResult() == ActionResult.FAIL) {
                 return new TypedActionResult<>(result.getResult(), storageBoxStack);
-            } else if (canInsertStack(resultStack, storageBoxStack)) {
+            } else if (stack.getItem().equals(resultStack.getItem())) {
                 // 食べ物など一定の時間を使って消費するアイテム
                 if (user.isUsingItem()) {
                     user.stopUsingItem();

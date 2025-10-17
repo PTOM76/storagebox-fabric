@@ -12,6 +12,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
@@ -36,7 +37,7 @@ public class StorageBoxItem extends Item {
     public static String KEY_SIZE = "StorageSize";
     public static String KEY_AUTO = "StorageAuto"; // 0 = true, 1 = false
     public static String KEY_ITEM_DATA = "StorageItemData";
-    public static final TagKey<Item> STORAGEBOX_BLACKLIST = TagKey.of(RegistryKeys.ITEM, Identifier.of(StorageBoxMod.MOD_ID, "storagebox_blacklist"));  // storageboxに入れることができないアイテム
+    public static final TagKey<Item> STORAGEBOX_BLACKLIST = TagKey.of(Registry.ITEM_KEY, new Identifier(StorageBoxMod.MOD_ID, "storagebox_blacklist"));  // storageboxに入れることができないアイテム
 
     public static Item getItem(ItemStack storageBoxStack) {
         ItemStack stack = getStackInStorageBox(storageBoxStack);

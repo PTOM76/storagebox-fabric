@@ -38,6 +38,7 @@ public class ItemPickupMixin {
             if (stackInNbt == null) return false;
             if (stackInNbt.getItem() == pickupStack.getItem()) {
                 if (!StorageBoxItem.canInsertStack(pickupStack, stack)) return false;
+                if (getComponentAsInt(stack, DataComponentTypes.ITEM_COUNT) + pickupStack.getCount() < 0) return false; // 2147483647を超える場合は回収しない
                 setItemStackSize(stack, getComponentAsInt(stack, DataComponentTypes.ITEM_COUNT) + pickupStack.getCount());
                 return true;
             }

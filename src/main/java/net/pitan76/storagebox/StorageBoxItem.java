@@ -349,7 +349,7 @@ public class StorageBoxItem extends Item {
             ItemStack preStack = stack.copy();
             result = item.useOnEntity(stack, user, entity, hand);
 
-            if (user.isInCreativeMode()) { // クリエイティブで数に変化があればロールバックする(exam.鞍、名札が該当。染料は変わらない)
+            if (user.isCreative()) { // クリエイティブで数に変化があればロールバックする(exam.鞍、名札が該当。染料は変わらない)
                 if (stack.isEmpty() && !preStack.isEmpty() || canInsertStack(stack, storageBoxStack) && preStack.getCount() != stack.getCount()){    // コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
                     stack = preStack.copy();
                 }
@@ -469,7 +469,7 @@ public class StorageBoxItem extends Item {
                 stack.decrement(1);
             }
             */
-            if (user.isInCreativeMode()) { // クリエイティブで数に変化があればロールバックする(exam.花火、ファイヤチャージ)
+            if (user.isCreative()) { // クリエイティブで数に変化があればロールバックする(exam.花火、ファイヤチャージ)
                 if (stack.isEmpty() && !preStack.isEmpty() || canInsertStack(stack, storageBoxStack) && preStack.getCount() != stack.getCount()) {    // コンポーネントは同じだが数だけ違う(コンポーネントが違うなら後で取り出す)
                     stack = preStack.copy();
                 }

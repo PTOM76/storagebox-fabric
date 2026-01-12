@@ -500,6 +500,7 @@ public class StorageBoxItem extends Item {
                         ItemStack stack = slot.getStack();
                         if (!stack.isEmpty()) continue;
                         ItemStack newStack = itemInBox.copy();
+                        if(!slot.canInsert(newStack)) continue;
                         int stackMax = itemInBox.getMaxCount();
                         // 64より大きい
                         if (count > stackMax) {

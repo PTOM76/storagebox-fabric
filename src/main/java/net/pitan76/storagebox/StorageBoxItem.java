@@ -19,6 +19,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -448,6 +449,8 @@ public class StorageBoxItem extends Item {
                         ItemStack stack = slot.getStack();
                         if (!stack.isEmpty()) continue;
                         ItemStack newStack = itemInBox.copy();
+                        if(!slot.canInsert(newStack)) continue;
+                        if(!slot.isEnabled()) continue;
                         int stackMax = itemInBox.getMaxCount();
                         // 64より大きい
                         if (count > stackMax) {
@@ -524,6 +527,8 @@ public class StorageBoxItem extends Item {
                         ItemStack stack = slot.getStack();
                         if (stack.getItem() == itemInBox.getItem()) {
                             if (!canInsertStack(stack, storageBoxStack)) continue;
+                            if (!slot.canTakeItems(player)) continue;
+                            if(!slot.isEnabled()) continue;
                             int storageCount;
                             if (((long)count)+((long)stack.getCount()) > 2147483647){   //2147483647以上は収納しようとしない
                                 storageCount = 2147483647-count;
@@ -531,12 +536,24 @@ public class StorageBoxItem extends Item {
                                 storageCount = stack.getCount();
                             }
                             if (storageCount > 0) {
-                                count += storageCount;
+                                //count += storageCount;
                                 // player.getInventory().removeOne(stack);
                                 // stack.setCount(0);
-                                stack.decrement(storageCount);
+                                ItemStack tryStack = slot.takeStack(storageCount);
+                                slot.onTakeItem(player, stack);
+                                /*
+                                この過程を踏まないと作業台の結果やクラフトスロットが更新されずに複製が起きる
+                                */
+                                int decCount = ItemStack.areItemsAndComponentsEqual(itemInBox, tryStack) ?
+                                        MathHelper.clamp(tryStack.getCount(), 0, storageCount) : 0;
+                                count += decCount;
+                                tryStack.decrement(decCount);
+                                if(!tryStack.isEmpty()){
+                                    player.dropItem(tryStack, false);
+                                }
+                                //stack.decrement(storageCount);
                                 //stack = ItemStack.EMPTY;
-                                slot.setStack(stack);
+                                //slot.setStack(stack);
 
                             }
                         }

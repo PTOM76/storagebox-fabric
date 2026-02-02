@@ -8,7 +8,7 @@ plugins {
 apply plugin: "com.modrinth.minotaur"
 apply plugin: "com.matthewprenger.cursegradle"
 
-archivesBaseName = project.archives_base_name
+base.archivesName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
@@ -49,8 +49,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			changelog = project.changelog
 			releaseType = 'release'
 			addGameVersion "Fabric"
-			addGameVersion "1.21.9"
-			addGameVersion "1.21.10"
+			addGameVersion "1.21.11"
 			relations {
 				requiredDependency "fabric-api"
 			}
@@ -65,7 +64,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'styMEyoE'
 		versionNumber = project.mod_version + "-fabric"
-		gameVersions = ["1.21.9", "1.21.10"]
+		gameVersions = ["1.21.11"]
 		versionType = 'release'
 		uploadFile = tasks.remapJar
 		changelog = project.changelog
@@ -109,7 +108,7 @@ java {
 	if (JavaVersion.current() < javaVersion) {
 		toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
 	}
-	archivesBaseName = project.archives_base_name
+	base.archivesName = project.archives_base_name
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
 	// if it is present.
 	// If you remove this line, sources will not be generated.
@@ -118,7 +117,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.base.archivesName}"}
 	}
 }
 

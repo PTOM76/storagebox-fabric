@@ -6,4 +6,5 @@ pluginManagement {
         }
         gradlePluginPortal()
     }
+//    includeBuild('E:/workspace/CurseGradle')
 }

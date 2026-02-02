@@ -20,7 +20,6 @@ repositories {
 	// for more information about repositories.
 	maven { url 'https://jitpack.io' }
 	maven { url "https://maven.shedaniel.me/" }
-    maven { url 'https://maven.pitan76.net/' }
 }
 
 loom {

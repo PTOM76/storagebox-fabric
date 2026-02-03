@@ -52,7 +52,7 @@ public class StorageBoxItem extends Item {
 
     // null のときは hasStackInStorageBox(storageBoxStack) で判定すること
     public static ItemStack getStackInStorageBox(ItemStack storageBoxStack) {
-        if (!storageBoxStack.getComponents().isEmpty()) return null;
+        if (storageBoxStack.getComponents().isEmpty()) return null;
         if (!storageBoxStack.contains(DataComponentTypes.ITEM_DATA)) return null;
 
         ItemStack stack = storageBoxStack.get(DataComponentTypes.ITEM_DATA).copy();

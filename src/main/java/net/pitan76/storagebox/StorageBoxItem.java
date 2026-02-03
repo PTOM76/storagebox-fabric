@@ -623,7 +623,7 @@ public class StorageBoxItem extends Item {
                                 /*
                                 この過程を踏まないと作業台の結果やクラフトスロットが更新されずに複製が起きる
                                 */
-                                int decCount = ItemStack.areItemsAndComponentsEqual(itemInBox, tryStack) ?
+                                int decCount = ItemStack.canCombine(itemInBox, tryStack) ?
                                         MathHelper.clamp(tryStack.getCount(), 0, storageCount) : 0;
                                 count += decCount;
                                 tryStack.decrement(decCount);

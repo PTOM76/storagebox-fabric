@@ -4,6 +4,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.pitan76.storagebox.StorageBoxItem;
 
+import static net.pitan76.storagebox.StorageBoxItem.removeItemDataAsInt;
+
 public class StorageBoxUtil {
     /**
      * Get the item stack in the storage box
@@ -46,8 +48,22 @@ public class StorageBoxUtil {
      * @param storageBoxStack The storage box stack
      * @param amount The amount of items
      */
-    public static void setAmountInStorageBox(ItemStack storageBoxStack, int amount) {
+    public static void setAmountOnlyInStorageBox(ItemStack storageBoxStack, int amount) {
         StorageBoxItem.setItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE, amount);
+    }
+
+    /**
+     * Set the amount of items in the storage box with clearing data if amount is zero or less
+     * @param storageBoxStack The storage box stack
+     * @param amount The amount of items
+     */
+    public static void setAmountInStorageBox(ItemStack storageBoxStack, int amount) {
+        if (amount <= 0) {
+            clearItemData(storageBoxStack);
+            return;
+        }
+
+        setAmountOnlyInStorageBox(storageBoxStack, amount);
     }
 
     /**
@@ -84,5 +100,16 @@ public class StorageBoxUtil {
      */
     public static boolean canInsertStack(ItemStack stack) {
         return StorageBoxItem.canInsertStack(stack);
+    }
+
+    /**
+     * Remove item data from the storage box
+     * @param storageBoxStack The storage box stack
+     */
+    public static void clearItemData(ItemStack storageBoxStack) {
+        removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_SIZE);
+        removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_DATA);
+        removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_ITEM_ID);
+        removeItemDataAsInt(storageBoxStack, StorageBoxItem.KEY_AUTO);
     }
 }

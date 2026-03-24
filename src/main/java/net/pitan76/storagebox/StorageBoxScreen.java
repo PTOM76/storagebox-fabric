@@ -17,6 +17,7 @@ public class StorageBoxScreen extends AbstractContainerScreen<StorageBoxScreenHa
 
     @Override
     public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractBackground(context, mouseX, mouseY, delta);
         int x = (this.width - this.imageWidth) / 2;
         int y = (this.height - this.imageHeight) / 2;
         context.blit(RenderPipelines.GUI_TEXTURED, GUI, x, y, 0, 0, this.imageWidth, this.imageHeight, 256, 256);

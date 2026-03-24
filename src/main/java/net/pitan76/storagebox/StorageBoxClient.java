@@ -66,7 +66,7 @@ public class StorageBoxClient implements ClientModInitializer {
 
     private boolean isKeyPressed() {
         final Window mw = Minecraft.getInstance().getWindow();
-        if (keyBinding_COLON.isDown()) {
+        if (InputConstants.isKeyDown(mw, keyBinding_COLON.key.getValue())) {
             if (coolDown <= 0) {
                 coolDown = 3;
                 return true;

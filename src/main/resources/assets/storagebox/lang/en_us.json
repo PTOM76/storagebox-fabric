@@ -2,5 +2,6 @@
   "item.storagebox.storagebox": "Storage Box",
   "item.storagebox.storage": "Storage",
   "key.storagebox.colon": "Key",
-  "key.category.storagebox.main": "Storage Box"
+  "key.category.storagebox.main": "Storage Box",
+  "tag.item.storagebox.storagebox_blacklist": "Storage Box Blacklist"
 }

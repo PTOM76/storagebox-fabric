@@ -49,7 +49,7 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			changelog = project.changelog
 			releaseType = 'release'
 			addGameVersion "Fabric"
-			addGameVersion "26.1-snapshot"
+			addGameVersion "26.1"
 			relations {
 				requiredDependency "fabric-api"
 			}
@@ -64,7 +64,7 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'styMEyoE'
 		versionNumber = project.mod_version + "-fabric"
-		gameVersions = ["26.1-rc-3"]
+		gameVersions = ["26.1"]
 		versionType = 'release'
 		uploadFile = tasks.jar
 		changelog = project.changelog

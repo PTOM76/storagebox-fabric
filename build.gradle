@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.15-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
 	id 'maven-publish'
 	id 'com.matthewprenger.cursegradle' version '1.5.0-SNAPSHOT' // FORK: maven.pitan76.net
 	id "com.modrinth.minotaur" version "2.+"
@@ -29,13 +29,13 @@ loom {
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+//	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
-	//modImplementation "me.shedaniel:RoughlyEnoughItems-fabric:14.0.687"
+	//implementation "me.shedaniel:RoughlyEnoughItems-fabric:14.0.687"
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.
@@ -49,12 +49,12 @@ if (System.getenv("CURSEFORGE_TOKEN") != null) {
 			changelog = project.changelog
 			releaseType = 'release'
 			addGameVersion "Fabric"
-			addGameVersion "1.21.11"
+			addGameVersion "26.1"
 			relations {
 				requiredDependency "fabric-api"
 			}
 
-			mainArtifact(tasks.remapJar)
+			mainArtifact(tasks.jar)
 		}
 	}
 }
@@ -64,9 +64,9 @@ if (System.getenv("MODRINTH_TOKEN") != null) {
 		token = System.getenv("MODRINTH_TOKEN")
 		projectId = 'styMEyoE'
 		versionNumber = project.mod_version + "-fabric"
-		gameVersions = ["1.21.11"]
+		gameVersions = ["26.1"]
 		versionType = 'release'
-		uploadFile = tasks.remapJar
+		uploadFile = tasks.jar
 		changelog = project.changelog
 		loaders = ["fabric"]
 		dependencies {
@@ -84,7 +84,7 @@ processResources {
 	}
 }
 
-def targetJavaVersion = 21
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
 	// ensure that the encoding is set to UTF-8, no matter what the system default is
 	// this fixes some edge cases with special characters not displaying correctly
@@ -93,14 +93,14 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 	it.options.release = targetJavaVersion
 
-	options.release = 21
+	options.release = 25
 }
 
 tasks.withType(JavaCompile).configureEach {
 	options.encoding = "UTF-8"
-	options.release = 21
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	options.release = 25
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 java {
@@ -126,12 +126,8 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
+			artifact(jar)
+			artifact(sourcesJar)
 		}
 	}
 

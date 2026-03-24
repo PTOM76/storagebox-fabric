@@ -1,2 +1,2 @@
-accessWidener   v1    named
-accessible  class   net/minecraft/datafixer/fix/ItemStackComponentizationFix$StackData
+accessWidener   v1    official
+accessible class net/minecraft/util/datafix/fixes/ItemStackComponentizationFix$ItemStackData

@@ -1,24 +1,32 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.recipe.RecipeSerializer;
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.recipe.book.CraftingRecipeCategory;
-import net.minecraft.recipe.input.CraftingRecipeInput;
-import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.world.World;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.display.RecipeDisplay;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.NotNull;
 
-public class AutoCollectRecipe extends SpecialCraftingRecipe {
-    public AutoCollectRecipe(CraftingRecipeCategory category) {
-        super(category);
+import java.util.List;
+
+public class AutoCollectRecipe extends CustomRecipe {
+    public AutoCollectRecipe() {
+
     }
 
+    public static final MapCodec<AutoCollectRecipe> MAP_CODEC = MapCodec.unit(new AutoCollectRecipe());
+    public static final StreamCodec<RegistryFriendlyByteBuf, AutoCollectRecipe> STREAM_CODEC = StreamCodec.unit(new AutoCollectRecipe());
+
+
+
     @Override
-    public boolean matches(CraftingRecipeInput input, World world) {
+    public boolean matches(CraftingInput input, @NotNull Level world) {
         int count = 0;
 
-        for (int i = 0; i < input.getStacks().size(); ++i) {
-            ItemStack stack = input.getStacks().get(i);
+        for (int i = 0; i < input.size(); ++i) {
+            ItemStack stack = input.getItem(i);
             if (stack.isEmpty()) continue;
             ++count;
             if (!(stack.getItem() instanceof StorageBoxItem)) return false;
@@ -27,9 +35,9 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingRecipeInput input, RegistryWrapper.WrapperLookup lookup) {
-        for (int i = 0; i < input.getStacks().size(); ++i) {
-            ItemStack stack = input.getStacks().get(i);
+    public @NotNull ItemStack assemble(CraftingInput input) {
+        for (int i = 0; i < input.size(); ++i) {
+            ItemStack stack = input.getItem(i);
             if (stack.isEmpty()) continue;
             if (!(stack.getItem() instanceof StorageBoxItem)) continue;
 
@@ -38,11 +46,16 @@ public class AutoCollectRecipe extends SpecialCraftingRecipe {
             return crafted;
         }
 
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
-    public RecipeSerializer<? extends SpecialCraftingRecipe> getSerializer() {
+    public RecipeSerializer<? extends CustomRecipe> getSerializer() {
         return StorageBoxRecipeSerializer.CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES;
+    }
+
+    @Override
+    public @NotNull List<RecipeDisplay> display() {
+        return super.display();
     }
 }

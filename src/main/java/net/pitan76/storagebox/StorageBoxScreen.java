@@ -1,42 +1,39 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Inventory;
 
-public class StorageBoxScreen extends HandledScreen<StorageBoxScreenHandler> {
+public class StorageBoxScreen extends AbstractContainerScreen<StorageBoxScreenHandler> {
 
     public static Identifier GUI = StorageBoxMod.id("textures/item/itemselect.png");
 
-    public StorageBoxScreen(StorageBoxScreenHandler handler, PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
-        this.backgroundWidth = 176;
-        this.backgroundHeight = 166;
+    public StorageBoxScreen(StorageBoxScreenHandler handler, Inventory inventory, Component title) {
+        super(handler, inventory, title, 176, 166);
     }
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        int x = (this.width - this.backgroundWidth) / 2;
-        int y = (this.height - this.backgroundHeight) / 2;
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, GUI, x, y, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256);
+    public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        int x = (this.width - this.imageWidth) / 2;
+        int y = (this.height - this.imageHeight) / 2;
+        context.blit(RenderPipelines.GUI_TEXTURED, GUI, x, y, 0, 0, this.imageWidth, this.imageHeight, 256, 256);
     }
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        super.drawForeground(context, mouseX, mouseY);
-        x = (this.width - this.backgroundWidth) / 2;
-        y = (this.height - this.backgroundHeight) / 2;
-        context.drawText(textRenderer, Text.translatable("item.storagebox.storage"), 8, 20, -12566464, false);
-        context.drawText(textRenderer, Text.translatable("item.storagebox.storagebox"), 8, 6, -12566464, false);
+    public void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {
+        super.extractLabels(context, mouseX, mouseY);
+        titleLabelX = (this.width - this.imageWidth) / 2;
+        titleLabelY = (this.height - this.imageHeight) / 2;
+        context.text(font, Component.translatable("item.storagebox.storage"), 8, 20, -12566464, false);
+        context.text(font, Component.translatable("item.storagebox.storagebox"), 8, 6, -12566464, false);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
-        this.drawMouseoverTooltip(context, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        this.extractTooltip(context, mouseX, mouseY);
     }
 }

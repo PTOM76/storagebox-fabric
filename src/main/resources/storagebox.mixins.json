@@ -4,7 +4,6 @@
   "package": "net.pitan76.storagebox.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "ItemEntityAccessor",
     "ItemPickupMixin",
     "ItemStackComponentizationFixMixin"
   ],

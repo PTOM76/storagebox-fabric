@@ -1,14 +1,14 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.recipe.SpecialCraftingRecipe;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 public class StorageBoxRecipeSerializer {
-    public static SpecialCraftingRecipe.SpecialRecipeSerializer<AutoCollectRecipe> CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES = new SpecialCraftingRecipe.SpecialRecipeSerializer<>(AutoCollectRecipe::new);
+    public static RecipeSerializer<AutoCollectRecipe> CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES = new RecipeSerializer<>(AutoCollectRecipe.MAP_CODEC, AutoCollectRecipe.STREAM_CODEC);
 
     public static void init() {
-        Registry.register(Registries.RECIPE_SERIALIZER, StorageBoxMod.key(RegistryKeys.RECIPE_SERIALIZER, "autocollectrecipes"), CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, StorageBoxMod.key(Registries.RECIPE_SERIALIZER, "autocollectrecipes"), CRAFTING_SPECIAL_AUTO_COLLECT_RECIPES);
     }
 }

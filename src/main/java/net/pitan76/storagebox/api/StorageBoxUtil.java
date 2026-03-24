@@ -1,7 +1,7 @@
 package net.pitan76.storagebox.api;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.pitan76.storagebox.DataComponentTypes;
 import net.pitan76.storagebox.StorageBoxItem;
 
@@ -90,7 +90,7 @@ public class StorageBoxUtil {
      * @param player The player
      * @param itemStack The item stack
      */
-    public static void keyboardEvent(int event, ServerPlayerEntity player, ItemStack itemStack) {
+    public static void keyboardEvent(int event, ServerPlayer player, ItemStack itemStack) {
         StorageBoxItem.keyboardEvent(event, player, itemStack);
     }
 

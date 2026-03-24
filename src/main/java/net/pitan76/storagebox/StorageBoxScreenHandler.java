@@ -1,39 +1,40 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.resource.featuretoggle.FeatureSet;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class StorageBoxScreenHandler extends ScreenHandler {
+public class StorageBoxScreenHandler extends AbstractContainerMenu {
 
-    public static ScreenHandlerType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
+    public static MenuType<StorageBoxScreenHandler> SCREEN_HANDLER_TYPE;
 
     public static void init() {
-        SCREEN_HANDLER_TYPE = Registry.register(Registries.SCREEN_HANDLER,  StorageBoxMod.id("storagebox"), new ScreenHandlerType<>(StorageBoxScreenHandler::new, FeatureSet.empty()));
+        SCREEN_HANDLER_TYPE = Registry.register(BuiltInRegistries.MENU, StorageBoxMod.id("storagebox"), new MenuType<>(StorageBoxScreenHandler::new, FeatureFlagSet.of()));
     }
 
-    private final Inventory inventory;
+    private final Container inventory;
     public final ItemStack handStack;
 
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public StorageBoxScreenHandler(int syncId, Inventory playerInventory, Player player) {
         this(syncId, playerInventory);
     }
 
-    public StorageBoxScreenHandler(int syncId, PlayerInventory playerInventory) {
+    public StorageBoxScreenHandler(int syncId, Inventory playerInventory) {
         super(SCREEN_HANDLER_TYPE, syncId);
         inventory = new StorageBoxInventory();
-        handStack = playerInventory.player.getMainHandStack();
+        handStack = playerInventory.player.getActiveItem();
         int m, l;
 
-        addSlot(new StorageBoxSlot(this, inventory, 0, 12, 35, playerInventory.player));
+        addSlot(new StorageBoxSlot(this, inventory, 0, 12, 35));
         for (m = 0; m < 9; ++m) {
             addSlot(new Slot(playerInventory, m, 8 + m * 18, 142));
         }
@@ -43,48 +44,48 @@ public class StorageBoxScreenHandler extends ScreenHandler {
             }
         }
     }
+    
     @Override
-    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
-        PlayerInventory playerInventory = player.getInventory();
+    public void clicked(int slotIndex, int button, ContainerInput actionType, Player player) {
+        Inventory playerInventory = player.getInventory();
         int playerSlotIndex = slotIndex-1;
         // System.out.println(slotIndex-1);
-        if ((playerSlotIndex >= 0 && playerSlotIndex < 36 || playerSlotIndex == 40) && playerInventory.getStack(playerSlotIndex) == handStack) {
+        if ((playerSlotIndex >= 0 && playerSlotIndex < 36 || playerSlotIndex == 40) && playerInventory.getItem(playerSlotIndex) == handStack) {
             return;
         }
-        super.onSlotClick(slotIndex, button, actionType, player);
+        super.clicked(slotIndex, button, actionType, player);
     }
     public ItemStack getHandStack() {
         return this.handStack;
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return inventory.stillValid(player);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int invSlot) {
+    public ItemStack quickMoveStack(Player player, int invSlot) {
         ItemStack newStack = ItemStack.EMPTY;
         Slot slot = this.slots.get(invSlot);
-        if (slot != null && slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack originalStack = slot.getItem();
             newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+            if (invSlot < this.inventory.getContainerSize()) {
+                if (!this.moveItemStackTo(originalStack, this.inventory.getContainerSize(), this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+            } else if (!this.moveItemStackTo(originalStack, 0, this.inventory.getContainerSize(), false)) {
                 return ItemStack.EMPTY;
             }
 
             if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.markDirty();
+                slot.setChanged();
             }
         }
 
         return StorageBoxItem.canInsertStack(newStack) ? newStack : ItemStack.EMPTY;
     }
-
 }

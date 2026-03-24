@@ -1,32 +1,31 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import static net.pitan76.storagebox.StorageBoxItem.*;
 
 public class StorageBoxSlot extends Slot {
 
-    private PlayerEntity player;
+//    private Player player;
     private final StorageBoxScreenHandler handler;
 
-    public StorageBoxSlot(StorageBoxScreenHandler handler, Inventory inventory, int index, int x, int y, PlayerEntity player) {
+    public StorageBoxSlot(StorageBoxScreenHandler handler, Container inventory, int index, int x, int y) {
         super(inventory, index, x, y);
-        this.player = player;
+//        this.player = player;
         this.handler = handler;
 
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return StorageBoxItem.canInsertStack(stack);
     }
 
     @Override
-    public void setStack(ItemStack itemStack) {
-        super.setStack(itemStack);
+    public void set(ItemStack itemStack) {
+        super.set(itemStack);
         if (itemStack.isEmpty()) {
             ItemStack storageBoxStack = handler.getHandStack();
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
@@ -40,16 +39,16 @@ public class StorageBoxSlot extends Slot {
     }
 
     @Override
-    public ItemStack takeStack(int amount) {
+    public ItemStack remove(int amount) {
         ItemStack storageBoxStack = handler.getHandStack();
-        if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.takeStack(amount);
-        if (amount == getStack().getCount()) {
+        if (!(storageBoxStack.getItem() instanceof StorageBoxItem)) return super.remove(amount);
+        if (amount == getItem().getCount()) {
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
             removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
             removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
         } else {
             setComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT, getComponentAsInt(storageBoxStack, DataComponentTypes.ITEM_COUNT) - amount);
         }
-        return super.takeStack(amount);
+        return super.remove(amount);
     }
 }

@@ -39,7 +39,7 @@
   "accessWidener": "storagebox.accesswidener",
   "depends": {
     "fabricloader": "*",
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": ">=1.21.11"
   }
 }

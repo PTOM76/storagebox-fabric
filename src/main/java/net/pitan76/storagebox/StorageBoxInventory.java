@@ -1,8 +1,8 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.world.SimpleContainer;
 
-public class StorageBoxInventory extends SimpleInventory {
+public class StorageBoxInventory extends SimpleContainer {
 
     public StorageBoxInventory() {
         super(1);

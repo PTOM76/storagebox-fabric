@@ -1,17 +1,17 @@
 package net.pitan76.storagebox;
 
-import net.minecraft.client.item.ItemModelManager;
-import net.minecraft.client.render.item.ItemRenderState;
-import net.minecraft.item.ItemDisplayContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.HeldItemContext;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.world.entity.ItemOwner;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ItemModelManagerHooks {
 
     private static final ThreadLocal<ItemStack> OVERRIDING_FOR = new ThreadLocal<>();
 
-    public static boolean update(ItemModelManager itemModelManager, ItemRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, World world, HeldItemContext context, int seed) {
+    public static boolean update(ItemModelResolver itemModelManager, ItemStackRenderState renderState, ItemStack stack, ItemDisplayContext displayContext, Level world, ItemOwner context, int seed) {
         if (OVERRIDING_FOR.get() == stack) return false;
         if (!(stack.getItem() instanceof StorageBoxItem)) return false;
 
@@ -22,7 +22,7 @@ public class ItemModelManagerHooks {
         renderStack.setCount(1);
 
         try {
-            itemModelManager.update(renderState, renderStack, displayContext, world, context, seed);
+            itemModelManager.appendItemLayers(renderState, renderStack, displayContext, world, context, seed);
         } finally {
             OVERRIDING_FOR.remove();
         }

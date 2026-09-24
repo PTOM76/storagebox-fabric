@@ -1,12 +1,8 @@
 plugins {
 	id 'net.fabricmc.fabric-loom' version '1.15-SNAPSHOT'
 	id 'maven-publish'
-	id 'com.matthewprenger.cursegradle' version '1.5.0-SNAPSHOT' // FORK: maven.pitan76.net
-	id "com.modrinth.minotaur" version "2.+"
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
-
-apply plugin: "com.modrinth.minotaur"
-apply plugin: "com.matthewprenger.cursegradle"
 
 base.archivesName = project.archives_base_name
 version = project.mod_version
@@ -41,38 +37,40 @@ dependencies {
 	// You may need to force-disable transitiveness on them.
 }
 
-if (System.getenv("CURSEFORGE_TOKEN") != null) {
-	curseforge {
-		apiKey = System.getenv("CURSEFORGE_TOKEN")
-		project {
-			id = '517673'
-			changelog = project.changelog
-			releaseType = 'release'
-			addGameVersion "Fabric"
-            addGameVersion "26.3"
-			relations {
-				requiredDependency "fabric-api"
-			}
+publishMods {
+    file = jar.archiveFile
+    version = project.mod_version
+    displayName = jar.archiveFileName
+    changelog = rootProject.changelog
 
-			mainArtifact(tasks.jar)
-		}
-	}
-}
+    type = STABLE
+    modLoaders.add("fabric")
 
-if (System.getenv("MODRINTH_TOKEN") != null) {
-	modrinth {
-		token = System.getenv("MODRINTH_TOKEN")
-		projectId = 'styMEyoE'
-		versionNumber = project.mod_version + "-fabric"
-		gameVersions = ["26.3"]
-		versionType = 'release'
-		uploadFile = tasks.jar
-		changelog = project.changelog
-		loaders = ["fabric"]
-		dependencies {
-			required.project "P7dR8mSH" // Fabric API
-		}
-	}
+    var curseforgeToken = providers.environmentVariable("CURSEFORGE_TOKEN")
+    var modrinthToken = providers.environmentVariable("MODRINTH_TOKEN")
+
+    if (curseforgeToken.isPresent()) {
+        curseforge {
+            accessToken = curseforgeToken
+            projectId = "517673"
+            minecraftVersions.addAll(['26.3'])
+
+            client = true
+            server = true
+
+            requires("fabric-api")
+        }
+    }
+
+    if (modrinthToken.isPresent()) {
+        modrinth {
+            accessToken = modrinthToken
+            projectId = "styMEyoE"
+            minecraftVersions.addAll(['26.3'])
+
+            requires("fabric-api")
+        }
+    }
 }
 
 processResources {

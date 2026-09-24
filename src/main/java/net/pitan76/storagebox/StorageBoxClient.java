@@ -1,17 +1,14 @@
 package net.pitan76.storagebox;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.platform.Window;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import org.lwjgl.glfw.GLFW;
 
 public class StorageBoxClient implements ClientModInitializer {
 
@@ -21,8 +18,8 @@ public class StorageBoxClient implements ClientModInitializer {
     public void onInitializeClient() {
         keyBinding_COLON = KeyMappingHelper.registerKeyMapping(new KeyMapping(
                 "key.storagebox.colon",
-                InputConstants.Type.KEYSYM,
-                GLFW.GLFW_KEY_APOSTROPHE,
+                InputConstants.Type.KEYBOARD,
+                InputConstants.KEY_APOSTROPHE,
                 new KeyMapping.Category(Identifier.fromNamespaceAndPath("storagebox", "main"))
         ));
         MenuScreens.register(StorageBoxScreenHandler.SCREEN_HANDLER_TYPE, StorageBoxScreen::new);
@@ -65,8 +62,7 @@ public class StorageBoxClient implements ClientModInitializer {
     private int coolDown = 0;
 
     private boolean isKeyPressed() {
-        final Window mw = Minecraft.getInstance().getWindow();
-        if (InputConstants.isKeyDown(mw, keyBinding_COLON.key.getValue())) {
+        if (InputConstants.isKeyDown(keyBinding_COLON.key.getValue())) {
             if (coolDown <= 0) {
                 coolDown = 3;
                 return true;
@@ -78,14 +74,12 @@ public class StorageBoxClient implements ClientModInitializer {
     }
 
     private boolean isKeyDownShift() {
-        final Window mw = Minecraft.getInstance().getWindow();
-        return InputConstants.isKeyDown(mw, GLFW.GLFW_KEY_LEFT_SHIFT)
-                || InputConstants.isKeyDown(mw, GLFW.GLFW_KEY_RIGHT_SHIFT);
+        return InputConstants.isKeyDown(InputConstants.KEY_LSHIFT)
+                || InputConstants.isKeyDown(InputConstants.KEY_RSHIFT);
     }
 
     private boolean isKeyDownCtrl() {
-        final Window mw = Minecraft.getInstance().getWindow();
-        return InputConstants.isKeyDown(mw, GLFW.GLFW_KEY_LEFT_CONTROL)
-                || InputConstants.isKeyDown(mw, GLFW.GLFW_KEY_RIGHT_CONTROL);
+        return InputConstants.isKeyDown(InputConstants.KEY_LCONTROL)
+                || InputConstants.isKeyDown(InputConstants.KEY_RCONTROL);
     }
 }

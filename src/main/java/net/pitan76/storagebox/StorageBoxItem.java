@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -145,7 +146,7 @@ public class StorageBoxItem extends Item {
 
     public void dropItemStack(LivingEntity entity, ItemStack itemstack) {
         if (entity instanceof Player player) {
-            player.drop(itemstack.copy(), false);
+            player.drop(itemstack.copy(), false, Prediction.PREDICTED);
             itemstack.setCount(0);
         }
     }
@@ -508,7 +509,7 @@ public class StorageBoxItem extends Item {
                     if (canGive(player.getInventory().getNonEquipmentItems())) {
                         player.addItem(giveStack);
                     } else {
-                        player.drop(giveStack, false);
+                        player.drop(giveStack, false, Prediction.PREDICTED);
                     }
                     setItemStackSize(storageBoxStack, count - stackMax);
                 } else {
@@ -516,7 +517,7 @@ public class StorageBoxItem extends Item {
                     if (canGive(player.getInventory().getNonEquipmentItems())) {
                         player.addItem(giveStack);
                     } else {
-                        player.drop(giveStack, false);
+                        player.drop(giveStack, false, Prediction.PREDICTED);
                     }
                     removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                     removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
@@ -533,11 +534,11 @@ public class StorageBoxItem extends Item {
                 int stackMax = itemInBox.getMaxStackSize();
                 if (count > stackMax) {
                     dropStack.setCount(stackMax);
-                    player.drop(dropStack, false);
+                    player.drop(dropStack, false, Prediction.PREDICTED);
                     setItemStackSize(storageBoxStack, count - stackMax);
                 } else {
                     dropStack.setCount(count);
-                    player.drop(dropStack, false);
+                    player.drop(dropStack, false, Prediction.PREDICTED);
                     removeComponent(storageBoxStack, DataComponentTypes.ITEM_COUNT);
                     removeComponent(storageBoxStack, DataComponentTypes.ITEM_DATA);
                     removeComponent(storageBoxStack, DataComponentTypes.AUTO_COLLECT);
@@ -556,7 +557,7 @@ public class StorageBoxItem extends Item {
                         if (stack.getItem() == itemInBox.getItem()) {
                             if (!canInsertStack(stack, storageBoxStack)) continue;
                             if (!slot.mayPickup(player)) continue;
-                            if(!slot.isActive()) continue;
+                            if (!slot.isActive()) continue;
                             int storageCount;
                             if (((long)count)+((long)stack.getCount()) > 2147483647){   //2147483647以上は収納しようとしない
                                 storageCount = 2147483647-count;
@@ -576,8 +577,8 @@ public class StorageBoxItem extends Item {
                                         Mth.clamp(tryStack.getCount(), 0, storageCount) : 0;
                                 count += decCount;
                                 tryStack.shrink(decCount);
-                                if(!tryStack.isEmpty()){
-                                    player.drop(tryStack, false);
+                                if (!tryStack.isEmpty()) {
+                                    player.drop(tryStack, false, Prediction.PREDICTED);
                                 }
                                 //stack.shrink(storageCount);
                                 //stack = ItemStack.EMPTY;
